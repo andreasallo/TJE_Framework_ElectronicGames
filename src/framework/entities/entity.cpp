@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+static std::vector<Entity*> s_to_destroy;
+
 void Entity::render(Camera* camera)
 {
 	for (int i = 0; i < children.size(); ++i) {
@@ -16,6 +18,18 @@ void Entity::update(float delta_time)
 		children[i]->update(delta_time);
 	}
 }
+
+void Entity::destroy()
+{
+	// Añadir a la lista para borrar
+	s_to_destroy.push_back(this);
+
+	// Propagar la destrucción a los hijos
+	for (int i = 0; i < children.size(); ++i) {
+		children[i]->destroy();
+	}
+}
+
 
 void Entity::addChild(Entity* child)
 {

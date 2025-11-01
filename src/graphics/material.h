@@ -15,5 +15,5 @@ public:
 
 struct sRenderData {
 	Material material;
-	std::vector<Matrix44> models;
+	std::vector<Matrix44> models; //guardo un array d models por cada material. la cantidad d matrix models me dice cuantos arboles d tipo material hay.
 };

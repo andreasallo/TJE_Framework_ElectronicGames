@@ -22,10 +22,13 @@ public:
 	void addChild(Entity* child);
 	void removeChild(Entity* child);
 
+
+
 	// Methods that should be overwritten
 	// by derived classes 
 	virtual void render(Camera* camera);
 	virtual void update(float delta_time);
+	virtual void destroy();
 
 	// Some useful methods
 	Matrix44 getGlobalMatrix();

@@ -7,6 +7,7 @@
 #include "framework/includes.h"
 #include "framework/camera.h"
 #include "framework/utils.h"
+#include "framework/entities/entity.h"
 
 class Game
 {
@@ -24,6 +25,9 @@ public:
 	float elapsed_time;
 	int fps;
 	bool must_exit;
+
+
+	Entity* root;
 
 	//some vars
 	Camera* camera; //our global camera

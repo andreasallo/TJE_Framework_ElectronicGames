@@ -5,6 +5,9 @@
 #include "graphics/fbo.h"
 #include "graphics/shader.h"
 #include "framework/input.h"
+#include "scene_parser.h"
+#include "framework/entities/entityMesh.h"
+#include "framework/entities/entity.h"
 
 #include <cmath>
 
@@ -13,9 +16,11 @@ Mesh* mesh = NULL;
 Texture* texture = NULL;
 Shader* shader = NULL;
 float angle = 0;
-float mouse_speed = 100.0f;
+float mouse_speed = 10.0f;
 
 Game* Game::instance = NULL;
+
+Entity* root = nullptr;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -37,14 +42,61 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	// Create our camera
 	camera = new Camera();
-	camera->lookAt(Vector3(0.f,100.f, 100.f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
+	camera->lookAt(Vector3(0.f,1.f, 1.f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
-	// Load one texture using the Texture Manager
-	texture = Texture::Get("data/textures/texture.tga");
+	//CREATE ROOT ENTITY	
+	root = new Entity();
+	root->name = "root";
 
-	// Example of loading Mesh from Mesh Manager
-	mesh = Mesh::Get("data/meshes/box.ASE");
+	SceneParser parser;
+	parser.parse("data/myscene.scene", root);
+
+	//LOAD SKYBOX
+	{
+		Texture* cube_texture = new Texture();
+		cube_texture->loadCubemap("ProbaCubeMap", {
+			"data/nx.png",
+			"data/ny.png",
+			"data/nz.png",
+			"data/px.png",
+			"data/py.png",
+			"data/pz.png"
+			});
+
+		Material cubemap_material;
+		cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
+		cubemap_material.diffuse = cube_texture;
+
+		skybox = new EntityMesh(Mesh::Get("data/meshes/cubemap.ASE"), cubemap_material);
+		//skybox->culling = false;
+
+	}
+
+	//CREATE HEIGHTMAP
+	{
+		float size = 50.0f;
+
+		Mesh* heightmap_mesh = new Mesh();
+		heightmap_mesh->createSubdividedPlane(size);
+
+		Material heightmap_material;
+		heightmap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+		heightmap_material.diffuse = Texture::Get("data/textures/heightmap.png");
+		heightmap_material.color = Vector4(1.0, 1.0, 1.0, 1.0);
+
+		EntityMesh* heightmap = new EntityMesh(heightmap_mesh, heightmap_material);
+		heightmap->culling
+	}
+
+	{
+		/*Material material;
+		material.diffuse= Texture::Get("data/textures/texture.tga");
+		EntityMesh* entity = new EntityMesh(Mesh::Get("data/meshes/box.ASE"), material, "box");
+		root->addChild(entity);*/
+
+
+	}
 
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -65,7 +117,9 @@ void Game::render(void)
 	// Set the camera as default
 	camera->enable();
 
-	// Set flags
+	root->render(camera);
+
+	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
@@ -74,7 +128,7 @@ void Game::render(void)
 	Matrix44 m;
 	m.rotate(angle*DEG2RAD, Vector3(0.0f, 1.0f, 0.0f));
 
-	if(shader)
+	/*if (shader)
 	{
 		// Enable shader
 		shader->enable();
@@ -91,13 +145,15 @@ void Game::render(void)
 
 		// Disable shader
 		shader->disable();
-	}
+	}*/
 
+	root->render(camera);
 	// Draw the floor grid
 	drawGrid();
 
 	// Render the FPS, Draw Calls, etc
 	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
+
 
 	// Swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);

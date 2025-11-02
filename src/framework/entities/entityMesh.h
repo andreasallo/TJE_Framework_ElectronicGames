@@ -22,6 +22,9 @@ public:
 	// Check your framework material class!
 	Material material;
 
+	//culling
+	bool culling = true;
+
 	//Instancing
 
 	bool isInstanced = false;

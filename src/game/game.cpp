@@ -46,10 +46,9 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	camera->lookAt(Vector3(0.f,1.f, 1.f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
-	//CREATE ROOT ENTITY	
+	//LOAD SCENE	
 	root = new Entity();
 	root->name = "root";
-
 	SceneParser parser;
 	parser.parse("data/myscene.scene", root);
 
@@ -57,19 +56,19 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	{
 		Texture* cube_texture = new Texture();
 		cube_texture->loadCubemap("ProbaCubeMap", {
-			"data/nx.png",
-			"data/ny.png",
-			"data/nz.png",
-			"data/px.png",
-			"data/py.png",
-			"data/pz.png"
+			"data/Standard_cube/px.png",
+			"data/Standard_cube/nx.png",
+			"data/Standard_cube/ny.png",
+			"data/Standard_cube/py.png",
+			"data/Standard_cube/pz.png",
+			"data/Standard_cube/nz.png"
 			});
 
 		Material cubemap_material;
 		cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
 		cubemap_material.diffuse = cube_texture;
 
-		skybox = new EntityMesh(Mesh::Get("data/meshes/cubemap.ASE"), cubemap_material);
+		skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
 		//skybox->culling = false;
 
 	}
@@ -121,36 +120,19 @@ void Game::render(void)
 	// Set the camera as default
 	camera->enable();
 
-	//root->render(camera);
+	if (skybox) {
+		skybox->model.setTranslation(camera->eye);
+
+		glDisable(GL_DEPTH_TEST);
+		skybox->render(camera);
+		glEnable(GL_DEPTH_TEST);
+	}
 
 	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
 	glDisable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-   
-	// Create model matrix for cube
-	Matrix44 m;
-	m.rotate(angle*DEG2RAD, Vector3(0.0f, 1.0f, 0.0f));
-
-	/*if (shader)
-	{
-		// Enable shader
-		shader->enable();
-
-		// Upload uniforms
-		shader->setUniform("u_color", Vector4(1,1,1,1));
-		shader->setUniform("u_viewprojection", camera->viewprojection_matrix );
-		shader->setUniform("u_texture", texture, 0);
-		shader->setUniform("u_model", m);
-		shader->setUniform("u_time", time);
-
-		// Do the draw call
-		mesh->render( GL_TRIANGLES );
-
-		// Disable shader
-		shader->disable();
-	}*/
-
+	
 	root->render(camera);
 	// Draw the floor grid
 	drawGrid();
@@ -237,6 +219,7 @@ void Game::onResize(int width, int height)
 	camera->aspect =  width / (float)height;
 	window_width = width;
 	window_height = height;
+
 }
 
 void Game::setMouseLocked(bool must_lock)

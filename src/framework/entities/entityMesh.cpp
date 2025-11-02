@@ -37,16 +37,18 @@ void EntityMesh::render(Camera* camera) {
         BoundingBox box = transformBoundingBox(globalMatrix, mesh->box);
         const Vector3& center = box.center;
 
-        //distance culling
-        if (camera->eye.distance(center) > distance) {
-            return;
+        if (this->culling) {
+            //distance culling
+            if (camera->eye.distance(center) > distance) {
+                return;
+            }
+
+            //Frustrum Culling HACEMOS LA ESFERA
+            if (camera->testSphereInFrustum(center, box.halfsize.length()) != CLIP_INSIDE) { //clip_insnide es que esta dentro del frustrum(cono d vision)
+                return;
+            }
         }
-
-		//Frustrum Culling HACEMOS LA ESFERA
-        if (camera->testSphereInFrustum(center, box.halfsize.length()) != CLIP_INSIDE) { //clip_insnide es que esta dentro del frustrum(cono d vision)
-            return;
-		}
-
+       
 
     }
 

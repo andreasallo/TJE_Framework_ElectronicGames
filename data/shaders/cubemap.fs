@@ -6,6 +6,6 @@ uniform vec3 u_camera_position;
 
 void main(){
 
-	Vec3 dir=normalize( u_camera_position-v_world_position);
-	Gl_FragColor=textureCube(u_texture,uv)
+	vec3 dir=normalize( u_camera_position-v_world_position);
+	gl_FragColor=textureCube(u_texture,dir);
 }

@@ -9,7 +9,9 @@
 #include "framework/entities/entityMesh.h"
 #include "framework/entities/entity.h"
 
+
 #include <cmath>
+#include <iostream>
 
 //some globals
 Mesh* mesh = NULL;
@@ -20,7 +22,6 @@ float mouse_speed = 10.0f;
 
 Game* Game::instance = NULL;
 
-Entity* root = nullptr;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -73,7 +74,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	}
 
-	//CREATE HEIGHTMAP
+	/*//CREATE HEIGHTMAP
 	{
 		float size = 50.0f;
 
@@ -86,17 +87,20 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 		heightmap_material.color = Vector4(1.0, 1.0, 1.0, 1.0);
 
 		EntityMesh* heightmap = new EntityMesh(heightmap_mesh, heightmap_material);
-		heightmap->culling
+		heightmap->culling = false;
+		heightmap->model.translate(-size * 0.5f, 0.0f, -size * 0.5f);
+		root->addChild(heightmap);
 	}
 
 	{
 		/*Material material;
 		material.diffuse= Texture::Get("data/textures/texture.tga");
 		EntityMesh* entity = new EntityMesh(Mesh::Get("data/meshes/box.ASE"), material, "box");
-		root->addChild(entity);*/
+		root->addChild(entity);
+	}*/
 
 
-	}
+	
 
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -117,7 +121,7 @@ void Game::render(void)
 	// Set the camera as default
 	camera->enable();
 
-	root->render(camera);
+	//root->render(camera);
 
 	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
 	glDisable(GL_BLEND);

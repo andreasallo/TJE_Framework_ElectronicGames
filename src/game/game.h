@@ -8,6 +8,7 @@
 #include "framework/camera.h"
 #include "framework/utils.h"
 #include "framework/entities/entity.h"
+#include "framework/entities/entityMesh.h"
 
 class Game
 {
@@ -28,6 +29,8 @@ public:
 
 
 	Entity* root;
+	EntityMesh* skybox = nullptr;
+
 
 	//some vars
 	Camera* camera; //our global camera

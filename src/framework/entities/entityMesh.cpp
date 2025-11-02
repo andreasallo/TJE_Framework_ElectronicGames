@@ -66,7 +66,9 @@ void EntityMesh::render(Camera* camera) {
     // Enable shader and pass uniforms 
 	
     shader->enable();
-    shader->setUniform("u_model", getGlobalMatrix());
+
+	//upload uniforms
+    shader->setUniform("u_model", model);
     shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
     shader->setUniform("u_color", material.color);
     shader->setUniform("u_camera_position", camera->eye);

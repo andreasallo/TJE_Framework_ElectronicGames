@@ -5,7 +5,6 @@
 #include "graphics/fbo.h"
 #include "graphics/shader.h"
 #include "framework/input.h"
-#include "scene_parser.h"
 #include "framework/entities/entityMesh.h"
 #include "framework/entities/entity.h"
 
@@ -17,11 +16,12 @@
 Mesh* mesh = NULL;
 Texture* texture = NULL;
 Shader* shader = NULL;
-float angle = 0;
-float mouse_speed = 10.0f;
 
 Game* Game::instance = NULL;
+World* World::instance = NULL;
 
+MenuStage* menu_stage;
+PlayStage* play_stage;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -46,60 +46,12 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	camera->lookAt(Vector3(0.f,1.f, 1.f),Vector3(0.f,0.f,0.f), Vector3(0.f,1.f,0.f)); //position the camera and point to 0,0,0
 	camera->setPerspective(70.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
-	//LOAD SCENE	
-	root = new Entity();
-	root->name = "root";
-	SceneParser parser;
-	parser.parse("data/myscene.scene", root);
+	world = new World();
 
-	//LOAD SKYBOX
-	{
-		Texture* cube_texture = new Texture();
-		cube_texture->loadCubemap("ProbaCubeMap", {
-			"data/Standard_cube/px.png",
-			"data/Standard_cube/nx.png",
-			"data/Standard_cube/ny.png",
-			"data/Standard_cube/py.png",
-			"data/Standard_cube/pz.png",
-			"data/Standard_cube/nz.png"
-			});
+	menu_stage = new MenuStage();
+	play_stage = new PlayStage();
 
-		Material cubemap_material;
-		cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
-		cubemap_material.diffuse = cube_texture;
-
-		skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
-		//skybox->culling = false;
-
-	}
-
-	/*//CREATE HEIGHTMAP
-	{
-		float size = 50.0f;
-
-		Mesh* heightmap_mesh = new Mesh();
-		heightmap_mesh->createSubdividedPlane(size);
-
-		Material heightmap_material;
-		heightmap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-		heightmap_material.diffuse = Texture::Get("data/textures/heightmap.png");
-		heightmap_material.color = Vector4(1.0, 1.0, 1.0, 1.0);
-
-		EntityMesh* heightmap = new EntityMesh(heightmap_mesh, heightmap_material);
-		heightmap->culling = false;
-		heightmap->model.translate(-size * 0.5f, 0.0f, -size * 0.5f);
-		root->addChild(heightmap);
-	}
-
-	{
-		/*Material material;
-		material.diffuse= Texture::Get("data/textures/texture.tga");
-		EntityMesh* entity = new EntityMesh(Mesh::Get("data/meshes/box.ASE"), material, "box");
-		root->addChild(entity);
-	}*/
-
-
-	
+	current_stage = menu_stage;
 
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -111,35 +63,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 //what to do when the image has to be draw
 void Game::render(void)
 {
-	// Set the clear color (the background color)
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-
-	// Clear the window and the depth buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Set the camera as default
-	camera->enable();
-
-	if (skybox) {
-		skybox->model.setTranslation(camera->eye);
-
-		glDisable(GL_DEPTH_TEST);
-		skybox->render(camera);
-		glEnable(GL_DEPTH_TEST);
-	}
-
-	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
-	glDisable(GL_BLEND);
-	//glEnable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-	
-	root->render(camera);
-	// Draw the floor grid
-	drawGrid();
-
-	// Render the FPS, Draw Calls, etc
-	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
-
+	current_stage->render(camera);
 
 	// Swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
@@ -147,24 +71,16 @@ void Game::render(void)
 
 void Game::update(double seconds_elapsed)
 {
-	float speed = seconds_elapsed * mouse_speed; //the speed is defined by the seconds_elapsed so it goes constant
+	current_stage->update(seconds_elapsed, camera);
+}
 
-	// Example
-	angle += (float)seconds_elapsed * 10.0f;
-
-	// Mouse input to rotate the cam
-	if (Input::isMousePressed(SDL_BUTTON_LEFT) || mouse_locked) //is left button pressed?
-	{
-		camera->rotate(Input::mouse_delta.x * 0.005f, Vector3(0.0f,-1.0f,0.0f));
-		camera->rotate(Input::mouse_delta.y * 0.005f, camera->getLocalVector( Vector3(-1.0f,0.0f,0.0f)));
+void Game::setStage(int new_stage) {
+	if (new_stage == MAIN_MENU) {
+		current_stage = menu_stage;
 	}
-
-	// Async input to move the camera around
-	if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT) ) speed *= 10; //move faster with left shift
-	if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) camera->move(Vector3(0.0f, 0.0f, 1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) camera->move(Vector3(0.0f, 0.0f,-1.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) camera->move(Vector3(1.0f, 0.0f, 0.0f) * speed);
-	if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) camera->move(Vector3(-1.0f,0.0f, 0.0f) * speed);
+	else if (new_stage == PLAY_STAGE) {
+		current_stage = play_stage;
+	}
 }
 
 //Keyboard event handler (sync input)

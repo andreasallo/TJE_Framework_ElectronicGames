@@ -9,6 +9,11 @@
 #include "framework/utils.h"
 #include "framework/entities/entity.h"
 #include "framework/entities/entityMesh.h"
+#include "world.h"
+#include "stage.h"
+
+class Stage;
+class World;
 
 class Game
 {
@@ -27,14 +32,19 @@ public:
 	int fps;
 	bool must_exit;
 
+	//world
+	World* world;
 
-	Entity* root;
-	EntityMesh* skybox = nullptr;
-
+	//stage
+	Stage* current_stage;
 
 	//some vars
 	Camera* camera; //our global camera
 	bool mouse_locked; //tells if the mouse is locked (not seen)
+
+	//some more vars (abans globals)
+	float angle = 0;
+	float mouse_speed = 10.0f;
 
 	Game( int window_width, int window_height, SDL_Window* window );
 
@@ -53,4 +63,12 @@ public:
 	void onGamepadButtonDown(SDL_JoyButtonEvent event);
 	void onGamepadButtonUp(SDL_JoyButtonEvent event);
 	void onResize(int width, int height);
+	
+	//metodes get !!!
+	static Game* getInstance() { return instance; };
+	//static EntityMesh* getSkybox() { return instance->skybox; };
+	//static Entity* getRoot() { return instance->root; };
+
+	//stage !!!
+	void setStage(int new_stage);
 };

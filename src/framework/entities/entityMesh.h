@@ -14,8 +14,6 @@ public:
 	EntityMesh() {};
 	EntityMesh(Mesh* mesh, const Material& material, const std::string& name = "");
 
-
-
 	// Attributes of the derived class  
 	Mesh* mesh = nullptr;
 

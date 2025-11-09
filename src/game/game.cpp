@@ -51,7 +51,15 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	menu_stage = new MenuStage();
 	play_stage = new PlayStage();
 
+
 	current_stage = menu_stage;
+
+	Material cubemap_material;
+	cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
+	cubemap_material.diffuse = cube_texture;
+
+	skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
+	skybox->culling = false;
 
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");

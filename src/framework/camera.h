@@ -28,6 +28,9 @@ public:
 	float near_plane;	//near plane
 	float far_plane;	//far plane
 
+	float yaw = 0.0f; //for FPS camera
+	float pitch = 0.0f;
+
 	//for orthogonal projection
 	float left,right,top,bottom;
 

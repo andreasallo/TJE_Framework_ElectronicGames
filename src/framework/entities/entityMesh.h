@@ -1,6 +1,7 @@
 #pragma once
 #include "framework/entities/entity.h"
 #include "graphics/material.h"
+#include "framework/collision.h"
 
 
 class Mesh;
@@ -23,6 +24,7 @@ public:
 	//culling
 	bool culling = true;
 
+	int layer = eCollisionFilter::NONE;
 	//Instancing
 
 	bool isInstanced = false;

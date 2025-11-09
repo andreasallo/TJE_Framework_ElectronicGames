@@ -28,12 +28,14 @@ void EntityMesh::render(Camera* camera) {
         shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
         if (!shader) { return; } // No se puede renderizar sin shader
     }
-        
+   
+
     float distance = 10.0f;
 	std::vector<Matrix44> visible_models; //INSTANCING VISIBLE MODELS
-
+    
+    //Instancing 
 	//CULLING INSTANCED MESHES
-    if (isInstanced) {
+    if (isInstanced) { //si true vol dir que hi ha molts objectes, itera per totes les matrius models
         for (const auto& model_matrix : models) {
 
 			//Bounding box in world space
@@ -56,7 +58,7 @@ void EntityMesh::render(Camera* camera) {
             return; // No hay instancias visibles, no renderizamos nada
 		}
     }
-    else {
+    else { //culling per un unic mesh
 
         const Matrix44& globalMatrix = getGlobalMatrix();
         BoundingBox box = transformBoundingBox(globalMatrix, mesh->box);

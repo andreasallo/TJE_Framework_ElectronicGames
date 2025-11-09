@@ -10,6 +10,7 @@
 #include "graphics/mesh.h"
 #include "graphics/shader.h"
 #include "graphics/texture.h"
+#include "scene_parser.h"
 
 //aqui se carga un avion 
 //ir hacia la z, ir hacia delante
@@ -18,9 +19,39 @@
 //player->model.translate(0, 0, -41 * delta_time);
 
 
-World* World::instance = nullptr;
 
-void World::init() {
+World::World() {
+	instance = this;
+
+	//camera = new Camera();
+	camera = Game::instance->camera;
+
+	//LOAD SCENE	
+	root = new Entity();
+	root->name = "root";
+	SceneParser parser;
+	parser.parse("data/myscene.scene", root);
+
+	//LOAD SKYBOX
+	{
+		Texture* cube_texture = new Texture();
+		cube_texture->loadCubemap("ProbaCubeMap", {
+			"data/Standard_cube/px.png",
+			"data/Standard_cube/nx.png",
+			"data/Standard_cube/ny.png",
+			"data/Standard_cube/py.png",
+			"data/Standard_cube/pz.png",
+			"data/Standard_cube/nz.png"
+			});
+
+		Material cubemap_material;
+		cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
+		cubemap_material.diffuse = cube_texture;
+
+		skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
+		//skybox->culling = false;
+
+	}
 	if (!root) root = new Entity();
 
 	Material player_material;
@@ -28,6 +59,37 @@ void World::init() {
 	player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	player = new Player(Mesh::Get("data/model.obj"), player_material, "player");
 	addEntity(player);
+}
+
+void World::render(Camera* camera) {
+	// Set the clear color (the background color)
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	// Clear the window and the depth buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Set the camera as default
+	camera->enable();
+
+	if (skybox) {
+		skybox->model.setTranslation(camera->eye);
+
+		glDisable(GL_DEPTH_TEST);
+		skybox->render(camera);
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
+	glDisable(GL_BLEND);
+	//glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
+	root->render(camera);
+	// Draw the floor grid
+	drawGrid();
+
+	// Render the FPS, Draw Calls, etc
+	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
 }
 
 

@@ -9,7 +9,7 @@
 #include "framework/utils.h"
 #include "framework/entities/entity.h"
 #include "framework/entities/entityMesh.h"
-#include "world.h"
+#include "framework/world.h"
 #include "stage.h"
 
 class Stage;

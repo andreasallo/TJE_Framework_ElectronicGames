@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework/camera.h"
-#include "world.h"
+#include "framework/world.h"
 
 
 class Game;

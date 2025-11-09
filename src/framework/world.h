@@ -1,6 +1,8 @@
 #pragma once
 #include "framework/entities/entity.h"
+#include "game/game.h"
 #include <vector>
+#include "framework/utils.h"
 
 class Camera;
 class Player;
@@ -13,23 +15,20 @@ class World
 {
 
 private:
-	static World* instance;
+	//static World* instance;
 
-	World() {
-		instance = this;
-	}
 
 public:
-	static World* getInstance() {
-		return instance;
-	}
+	static World* instance;
+	
+	EntityMesh* skybox = nullptr;
 
-	void init();
+	World();
+	static World* getInstance() { return instance; };
 	
 
 	Camera* camera = nullptr;
 	Entity* root = nullptr;
-	entityMesh* skybox = nullptr;
 	Player* player = nullptr;
 
 	float camera_speed = 10.0f;
@@ -37,7 +36,7 @@ public:
 
 	bool free_camera = true;
 
-	void render();
+	void render(Camera* camera);
 	void update(float delta_time);
 
 	std::vector<Entity*> entities_to_destroy;

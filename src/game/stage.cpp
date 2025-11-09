@@ -1,4 +1,5 @@
 #include "stage.h"
+#include "framework/input.h"
 
 void MenuStage::render(Camera* camera) {
 
@@ -18,5 +19,5 @@ void PlayStage::render(Camera* camera) {
 
 void PlayStage::update(double seconds_elapsed, Camera* camera) {
 	World* instance = World::instance;
-	instance->update(seconds_elapsed, camera);
+	instance->update(seconds_elapsed);
 }

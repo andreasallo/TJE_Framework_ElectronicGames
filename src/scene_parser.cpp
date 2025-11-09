@@ -70,14 +70,10 @@ bool SceneParser::parse(const char* filename, Entity* root)
 		}
 		else {
 			Mesh* mesh = Mesh::Get(mesh_name.c_str());
-<<<<<<< HEAD
-			new_entity = new EntityMesh(mesh, mat);
-			//new_entity = new EntityCollider(mesh, mat);
-			// eCollisionFilter
-=======
+
 			new_entity = new EntityCollider(mesh, mat);
 			new_entity->layer = eCollisionFilter::SCENARIO;
->>>>>>> a664036 (player etc)
+
 		}
 
 		if (!new_entity) {

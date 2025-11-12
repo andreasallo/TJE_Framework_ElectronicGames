@@ -37,6 +37,10 @@ class PlayStage : public Stage {
 public:
 	eStage type = PLAY_STAGE;
 
+	Vector3 camera_current_eye;
+	Vector3 camera_current_center;
+	bool first_frame = true;
+
 	PlayStage() {}
 
 	void render(Camera* camera);

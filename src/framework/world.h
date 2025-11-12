@@ -31,7 +31,7 @@ public:
 	Entity* root = nullptr;
 	Player* player = nullptr;
 
-	float camera_speed = 10.0f;
+	float camera_speed = 3.0f;
 	float mouse_speed = 10.0f;
 
 	bool free_camera = true;

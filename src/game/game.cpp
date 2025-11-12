@@ -79,7 +79,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 		root->addChild(entity);
 	}*/
 
-	current_stage = menu_stage;
+	current_stage = play_stage;
 
 
 	// Example of shader loading using the shaders manager

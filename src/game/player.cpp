@@ -27,7 +27,7 @@ Player::Player(Mesh* mesh, const Material& material, const std::string& name)
 }
 
 
-void Player::update(float delta_time)
+/*void Player::update(float delta_time)
 {
     Vector3 position = model.getTranslation();
     Camera* camera = Game::instance->camera;
@@ -67,6 +67,51 @@ void Player::update(float delta_time)
     }
     // Mou el jugador
     //model.translate(velocity.x, velocity.y, velocity.z);
+}*/
+void Player::update(float delta_time)
+{
+    //Obtener los vectores de orientación actuales del avión
+    Vector3 position = model.getTranslation();
+    Vector3 front = model.frontVector();
+    Vector3 up = model.rotateVector(Vector3(0, 1, 0));
+    Vector3 right = model.rightVector();
+
+    //Controlar la ROTACIÓN con las teclas
+
+    //pitch
+    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) {
+        model.rotate(-pitch_speed * delta_time, right);
+    }
+    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) {
+        model.rotate(pitch_speed * delta_time, right);
+    }
+
+    //yaw
+    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) {
+        model.rotate(yaw_speed * delta_time, up);
+    }
+    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) {
+        model.rotate(-yaw_speed * delta_time, up);
+    }
+
+    
+    front = model.frontVector();
+
+    
+    velocity = front * forward_speed;
+
+    
+    Vector3 new_position = position + velocity * delta_time;
+
+   
+    // 6. Comprobar colisiones ANTES de moverse
+    if (canMove(new_position)) {
+        position = new_position;
+        model.setTranslation(position);
+    }
+
+
+    EntityMesh::update(delta_time);
 }
 
 const Vector3& Player::getMovementDirection() {
@@ -98,10 +143,11 @@ bool Player::canMove(const Vector3& new_position) {
     bool collided = false;
 
     for (Entity* e : world->root->children) {
-        collided != Collision::TestEntitySphere(e,sphere_radius, new_position + Vector3(0.0f,height,0.0f), collisions, eCollisionFilter::SCENARIO);
+        if (e != this && Collision::TestEntitySphere(e, sphere_radius, new_position + Vector3(0.0f, height, 0.0f), collisions, eCollisionFilter::SCENARIO)) {
+            return false;
+        }
     }
-
-	return !collided;
+    return true;
 
 }
 

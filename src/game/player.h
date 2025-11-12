@@ -13,9 +13,14 @@ class Camera;
 class Player : public EntityMesh {
 private:
 
-	static Player* instance;
+	
 	bool render_mesh = true;
 	Vector3 velocity = Vector3(0.0f);
+
+	//AIRPLANE VARIABLES
+	float forward_speed = 20.0f;
+	float pitch_speed = 1.0f; //ariba/abajo
+	float yaw_speed = 0.8f;//rotacion izquierda/derecha
 
 	float speed = 6.0f;
 	float sphere_radius = 0.5f;
@@ -26,7 +31,7 @@ private:
 	
 
 public:
-
+	static Player* instance;
 	Player() {};
 	Player(Mesh* mesh, const Material& material, const std::string& name = "");
 	

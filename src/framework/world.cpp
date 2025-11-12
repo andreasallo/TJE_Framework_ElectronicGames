@@ -29,9 +29,23 @@ World::World() {
 	//LOAD SCENE	
 	root = new Entity();
 	root->name = "root";
+
+	Material player_material;
+	player_material.diffuse = Texture::Get("data/textures/texture.tga");
+	player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	//
+	player = new Player(Mesh::Get("data/nau_bl.obj"),player_material, "player");
+	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
+	player->model.scale(10.0f, 10.0f, 10.0f);
+	//Mesh* test_mesh = new Mesh();
+	//test_mesh->createCube(); // Crea un cubo perfecto por código
+	//player = new Player(test_mesh, player_material, "player");
+	addEntity(player);
+
 	SceneParser parser;
 	parser.parse("data/myscene.scene", root);
 
+	/*
 	//LOAD SKYBOX
 	{
 		Texture* cube_texture = new Texture();
@@ -51,19 +65,26 @@ World::World() {
 		skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
 		//skybox->culling = false;
 
-	}
+	}*/
+
+	/*
 	if (!root) root = new Entity();
 
 	Material player_material;
 	player_material.diffuse = Texture::Get("data/textures/texture.tga");
 	player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-	player = new Player(Mesh::Get("data/model.obj"), player_material, "player");
-	addEntity(player);
+	//player = new Player(Mesh::Get("data/nau_bl.obj"),player_material, "player");
+	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
+	//player->model.scale(10.0f, 10.0f, 10.0f);
+	Mesh* test_mesh = new Mesh();
+	test_mesh->createCube(); // Crea un cubo perfecto por código
+	player = new Player(test_mesh, player_material, "player");
+	addEntity(player);*/
 }
 
 void World::render(Camera* camera) {
 	// Set the clear color (the background color)
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
 	// Clear the window and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -81,7 +102,7 @@ void World::render(Camera* camera) {
 
 	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
 	glDisable(GL_BLEND);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
 	root->render(camera);
@@ -94,7 +115,7 @@ void World::render(Camera* camera) {
 
 
 void World::update(float delta_time) {
-	if (free_camera) {
+	/*if (free_camera) {
 		float speed = delta_time * camera_speed;
 
 		if (Input::isMousePressed(SDL_BUTTON_LEFT) || Game::instance->mouse_locked) {
@@ -133,7 +154,7 @@ void World::update(float delta_time) {
 		/*Vector3 front = mRotation.frontVector().normalize();
 		Vector3 eye = player->model.getTranslation() + front * 0.1f;
 		Vector3 center = eye + front * 2.0f;
-		*/
+		
 		//tercera persona
 
 		float orbit_distance = 1.0f;
@@ -155,8 +176,9 @@ void World::update(float delta_time) {
 
 		root->update(delta_time);
 		player->update(delta_time);
-	}
+	}*/
 
+	root->update(delta_time);
 	for (auto e : entities_to_destroy) {
 		if (e->parent) {
 			e->parent->removeChild(e);

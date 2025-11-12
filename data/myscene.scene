@@ -1,5 +1,5 @@
 #NAME MODEL
-scene/trainset-rail-straight/trainset-rail-straight.obj 1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,-1.0,0.0,0.0,0.0,0.0,0.0,1.0
+scene/trainset-rail-straight/trainset-rail-straight.obj 1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,-1.0,0.0,0.0,0.0048,-0.00673,0.00215,1.0
 scene/tree/tree.obj 1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,-1.0,0.0,0.0,-3.54759,0.59704,-1.53884,1.0
 scene/nutcracker/nutcracker.obj 1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,-1.0,0.0,0.0,-7.21684,0.57009,-14.28122,1.0
 scene/gingerbread-woman/gingerbread-woman.obj 1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,-1.0,0.0,0.0,0.43177,0.55449,-0.19779,1.0

@@ -72,14 +72,15 @@ void Player::update(float delta_time)
 {
     //Obtener los vectores de orientación actuales del avión
     Vector3 position = model.getTranslation();
-    Vector3 front = model.frontVector();
-    Vector3 up = model.rotateVector(Vector3(0, 1, 0));
-    Vector3 right = model.rightVector();
+    Vector3 front = model.frontVector().normalize();
+    Vector3 up = model.topVector().normalize();
+    Vector3 right = model.rightVector().normalize();
 
     //Controlar la ROTACIÓN con las teclas
 
     //pitch
     if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) {
+        std::cout << "PULSANDO ARRIBA/W - Rotando..." << std::endl;
         model.rotate(-pitch_speed * delta_time, right);
     }
     if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) {
@@ -95,7 +96,7 @@ void Player::update(float delta_time)
     }
 
     
-    front = model.frontVector();
+    front = model.frontVector().normalize();
 
     
     velocity = front * forward_speed;

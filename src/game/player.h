@@ -19,8 +19,8 @@ private:
 
 	//AIRPLANE VARIABLES
 	float forward_speed = 5.0f;
-	float pitch_speed = 1.0f; //ariba/abajo
-	float yaw_speed = 0.8f;//rotacion izquierda/derecha
+	float pitch_speed = 100.0f; //ariba/abajo
+	float yaw_speed = 100.0f;//rotacion izquierda/derecha
 
 	float speed = 6.0f;
 	float sphere_radius = 0.5f;

@@ -31,7 +31,9 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
         // --- Posición OBJETIVO de la cámara ---
         Vector3 player_pos = player->model.getTranslation();
         Vector3 player_front = player->model.frontVector();
-        Vector3 player_up = player->model.rotateVector(Vector3(0, 1, 0)); // ¡Clave!
+        //Vector3 player_up = player->model.rotateVector(Vector3(0, 1, 0)); // ¡Clave!
+        // Vector3 player_up = player->model.rotateVector(Vector3(0,1,0)); // COMENTA ESTO
+        Vector3 player_up = Vector3(0.0f, 1.0f, 0.0f); // PON ESTO FIJO
 
         Vector3 target_eye = player_pos - (player_front * 25.0f) + (player_up * 7.0f);
 

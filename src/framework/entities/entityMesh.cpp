@@ -30,7 +30,7 @@ void EntityMesh::render(Camera* camera) {
     }
    
 
-    float distance = 10.0f;
+    float distance = 1000.0f;
 	std::vector<Matrix44> visible_models; //INSTANCING VISIBLE MODELS
     
     //Instancing 

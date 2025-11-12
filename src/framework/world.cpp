@@ -32,14 +32,14 @@ World::World() {
 
 	Material player_material;
 	player_material.diffuse = Texture::Get("data/textures/texture.tga");
-	player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	//
-	player = new Player(Mesh::Get("data/nau_bl.obj"),player_material, "player");
+	//player = new Player(Mesh::Get("data/nau_bl.obj"),player_material, "player");
 	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
-	player->model.scale(10.0f, 10.0f, 10.0f);
-	//Mesh* test_mesh = new Mesh();
-	//test_mesh->createCube(); // Crea un cubo perfecto por código
-	//player = new Player(test_mesh, player_material, "player");
+	//player->model.scale(10.0f, 90.0f, 90.0f);
+	Mesh* test_mesh = new Mesh();
+	test_mesh->createCube(); // Crea un cubo perfecto por código
+	player = new Player(test_mesh, player_material, "player");
 	addEntity(player);
 
 	SceneParser parser;
@@ -88,7 +88,7 @@ void World::render(Camera* camera) {
 
 	// Clear the window and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	// Set the camera as default
 	camera->enable();
 
@@ -100,6 +100,7 @@ void World::render(Camera* camera) {
 		glEnable(GL_DEPTH_TEST);
 	}
 
+	player->render(camera);
 	// Set flags //ESTO LO GESTIONARA ENTITY MESH RENDER
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);

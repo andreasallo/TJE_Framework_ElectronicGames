@@ -18,7 +18,7 @@ private:
 	Vector3 velocity = Vector3(0.0f);
 
 	//AIRPLANE VARIABLES
-	float forward_speed = 20.0f;
+	float forward_speed = 5.0f;
 	float pitch_speed = 1.0f; //ariba/abajo
 	float yaw_speed = 0.8f;//rotacion izquierda/derecha
 

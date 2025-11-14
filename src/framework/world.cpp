@@ -31,19 +31,28 @@ World::World() {
 	root->name = "root";
 
 	Material player_material;
-	player_material.diffuse = Texture::Get("data/textures/texture.tga");
+	player_material.diffuse = Texture::Get("data/craft_speederA.mtl");
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	//
-	//player = new Player(Mesh::Get("data/nau_bl.obj"),player_material, "player");
+	player = new Player(Mesh::Get("data/craft_speederA.obj"), player_material, "player");
 	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
 	//player->model.scale(10.0f, 90.0f, 90.0f);
+
+	//PLAYER CUBE PLACEHOLDER
+	/*
 	Mesh* test_mesh = new Mesh();
 	test_mesh->createCube(); // Crea un cubo perfecto por código
 	player = new Player(test_mesh, player_material, "player");
-	addEntity(player);
 
+	addEntity(player);
+	*/
 	SceneParser parser;
 	parser.parse("data/myscene.scene", root);
+
+	if (player) {
+		smoothedTarget = player->model.getTranslation();
+	}
+	
 
 	/*
 	//LOAD SKYBOX
@@ -88,7 +97,7 @@ void World::render(Camera* camera) {
 
 	// Clear the window and the depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	// Set the camera as default
 	camera->enable();
 
@@ -114,9 +123,10 @@ void World::render(Camera* camera) {
 	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
 }
 
-
+/*
 void World::update(float delta_time) {
-	/*if (free_camera) {
+
+	if (free_camera) {
 		float speed = delta_time * camera_speed;
 
 		if (Input::isMousePressed(SDL_BUTTON_LEFT) || Game::instance->mouse_locked) {
@@ -135,6 +145,7 @@ void World::update(float delta_time) {
 	else {
 
 		//UPDATE CAMERA CONTROLLER 1st person
+		
 		float mouse_factor = 0.005f;
 
 		camera->yaw -= Input::mouse_delta.x * delta_time * mouse_speed;
@@ -152,24 +163,25 @@ void World::update(float delta_time) {
 		Vector3 front = mRotation.frontVector().normalize();
 
 		//calcular front
-		/*Vector3 front = mRotation.frontVector().normalize();
+
+		Vector3 front = mRotation.frontVector().normalize();
 		Vector3 eye = player->model.getTranslation() + front * 0.1f;
 		Vector3 center = eye + front * 2.0f;
-		
+
 		//tercera persona
 
 		float orbit_distance = 1.0f;
 		Vector3 player_position = player->model.getTranslation() + Vector3(0, 0.4, 0); //altura dels ulls
 
 		//persona
-		//Vector3 center = player_position;
-		//Vector3 eye = center - front * orbit_distance;
+		Vector3 center = player_position;
+		Vector3 eye = center - front * orbit_distance;
 		
 		//AVIO
 		Vector3 eye = player->model * Vector3(0, 5, 10);
 		Vector3 center = player->model.getTranslation() - player->model.frontVector() * 10.0f;
 
-		//camera->lookAt(eye, center, Vector3(0, 1, 0));
+		camera->lookAt(eye, center, Vector3(0, 1, 0));
 
 		//CONTROLADOR AVIO
 		//eye = player->model * (0, 5, 10);
@@ -177,7 +189,38 @@ void World::update(float delta_time) {
 
 		root->update(delta_time);
 		player->update(delta_time);
-	}*/
+		
+		
+		// --- Posición OBJETIVO de la cámara ---
+		Vector3 player_pos = player->model.getTranslation();
+		Vector3 player_front = player->model.frontVector();
+		//Vector3 player_up = player->model.rotateVector(Vector3(0, 1, 0)); // ¡Clave!
+		// Vector3 player_up = player->model.rotateVector(Vector3(0,1,0)); // COMENTA ESTO
+		Vector3 player_up = Vector3(0.0f, 1.0f, 0.0f); // PON ESTO FIJO
+
+		Vector3 target_eye = player_pos - (player_front * 1.0f) + (player_up * 1.0f);
+
+		//on mira la camera al punto delante del jugador
+		Vector3 target_center = player_pos + (player_front * 10.0f);
+
+		//iniliciacion
+		if (first_frame) {
+			camera_current_eye = target_eye;
+			camera_current_center = target_center;
+			first_frame = false;
+		}
+
+		//INTERPOLACIÓN
+		// En lugar de saltar, suavizamos el movimiento
+		float smoothness = 5.0f;
+		camera_current_eye = lerp(camera_current_eye, target_eye, delta_time * smoothness);
+		camera_current_center = lerp(camera_current_center, target_center, delta_time * smoothness);
+
+		//Actualizar la cámara real
+		camera->lookAt(camera_current_eye, camera_current_center, player_up);
+
+		//root->update(delta_time);
+	}/*
 
 	root->update(delta_time);
 	for (auto e : entities_to_destroy) {
@@ -186,8 +229,46 @@ void World::update(float delta_time) {
 		}
 		delete e;
 	}
-	entities_to_destroy_clear();		 
+	entities_to_destroy_clear();
+}*/
+
+
+void World::update(float delta_time)
+{
+	// Actualitzar jugador
+	player->update(delta_time);
+
+	// Actualitzar càmera
+	updateCamera(delta_time);
+
+	// Actualitzar resta d’entitats
+	for (auto e : entities_to_destroy) {
+		if (e->parent) {
+			e->parent->removeChild(e);
+		}
+		delete e;
+	}
+	entities_to_destroy_clear();
 }
+
+void World::updateCamera(float dt)
+{
+	Vector3 planePos = player->model.getTranslation();
+	Vector3 front = player->model.frontVector().normalize();
+
+	// MOOTHING
+	smoothedTarget = smoothedTarget * 0.9f + planePos * 0.1f;
+
+	//POSICIÓ CÀMERA
+	Vector3 cam_offset=Vector3(0.0f, 0.3f, -1.2f);
+
+	Vector3 eye =smoothedTarget +front * cam_offset.z +Vector3(0.0f, cam_offset.y, 0.0f);
+
+	Vector3 center = smoothedTarget;
+
+	camera->lookAt(eye, center, Vector3(0, 1, 0));
+}
+
 
 
 void World::addEntity(Entity* entity) {
@@ -201,4 +282,3 @@ void World::destroyEntity(Entity* entity) {
 void World::entities_to_destroy_clear() {
 	entities_to_destroy.clear();
 }
-

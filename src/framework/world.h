@@ -16,16 +16,18 @@ class World
 
 private:
 	//static World* instance;
+	Vector3 smoothedTarget;
+
 
 
 public:
 	static World* instance;
-	
+
 	EntityMesh* skybox = nullptr;
 
 	World();
 	static World* getInstance() { return instance; };
-	
+
 
 	Camera* camera = nullptr;
 	Entity* root = nullptr;
@@ -34,7 +36,11 @@ public:
 	float camera_speed = 3.0f;
 	float mouse_speed = 10.0f;
 
-	bool free_camera = true;
+	bool free_camera = false;
+
+	Vector3 camera_current_eye;
+	Vector3 camera_current_center;
+	bool first_frame = true;
 
 	void render(Camera* camera);
 	void update(float delta_time);
@@ -43,10 +49,13 @@ public:
 
 	void addEntity(Entity* entity);
 	void destroyEntity(Entity* entity);
+	void updateCamera(float dt);
 
 	void entities_to_destroy_clear();
-	
+
 };
+
+
 
 
 

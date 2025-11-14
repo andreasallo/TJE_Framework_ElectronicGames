@@ -9,36 +9,36 @@
 EntityMesh::EntityMesh(Mesh* mesh, const Material& material, const std::string& name) {
     this->mesh = mesh;
     this->material = material;
-	this->name = name;
+    this->name = name;
 }
 
 
 void EntityMesh::render(Camera* camera) {
 
-	//not mesh-> dont rendering anything
+    //not mesh-> dont rendering anything
     if (!mesh) {
-		Entity::render(camera);
+        Entity::render(camera);
         return;
     }
-    
-	//START OF ENTITYMESH RENDER
+
+    //START OF ENTITYMESH RENDER
     Shader* shader = material.shader;
 
     if (!shader) {
         shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
         if (!shader) { return; } // No se puede renderizar sin shader
     }
-   
+
 
     float distance = 1000.0f;
-	std::vector<Matrix44> visible_models; //INSTANCING VISIBLE MODELS
-    
+    std::vector<Matrix44> visible_models; //INSTANCING VISIBLE MODELS
+
     //Instancing 
-	//CULLING INSTANCED MESHES
+    //CULLING INSTANCED MESHES
     if (isInstanced) { //si true vol dir que hi ha molts objectes, itera per totes les matrius models
         for (const auto& model_matrix : models) {
 
-			//Bounding box in world space
+            //Bounding box in world space
             BoundingBox box = transformBoundingBox(model_matrix, mesh->box);
             const Vector3& center = box.center;
 
@@ -49,14 +49,14 @@ void EntityMesh::render(Camera* camera) {
 
             // Frustrum Culling USE SPHERE
             if (culling && camera->testSphereInFrustum(center, box.halfsize.length()) != CLIP_INSIDE) {
-                continue; 
+                continue;
             }
 
             visible_models.push_back(model_matrix);
         }
         if (visible_models.empty()) {
             return; // No hay instancias visibles, no renderizamos nada
-		}
+        }
     }
     else { //culling per un unic mesh
 
@@ -75,21 +75,21 @@ void EntityMesh::render(Camera* camera) {
                 return;
             }
         }
-       
 
-    } 
+
+    }
 
     // Set OpenGL flags
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+    glCullFace(GL_BACK);
 
- 
+
     //Enable shader and pass uniforms --- SHADER PART
     shader->enable();
 
-	//upload uniforms
+    //upload uniforms
     shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
     shader->setUniform("u_color", material.color);
     shader->setUniform("u_camera_position", camera->eye);
@@ -104,26 +104,26 @@ void EntityMesh::render(Camera* camera) {
         shader->setUniform("u_texture", 0);
     }
 
-	if (isInstanced) { //----------RENDER INSTANCED MESHES
-		//renderizar totes les instancies visibles
-		shader->setMatrix44Array("u_models", visible_models.data(),(int)visible_models.size()); 
-		mesh->renderInstanced(GL_TRIANGLES, visible_models.data(),(int)visible_models.size());
-	}
-        
+    if (isInstanced) { //----------RENDER INSTANCED MESHES
+        //renderizar totes les instancies visibles
+        shader->setMatrix44Array("u_models", visible_models.data(), (int)visible_models.size());
+        mesh->renderInstanced(GL_TRIANGLES, visible_models.data(), (int)visible_models.size());
+    }
+
     else {
         //Render single mesh
-		shader->setUniform("u_model", model);
+        shader->setUniform("u_model", model);
         mesh->render(GL_TRIANGLES);
-	}
+    }
 
     // Disable shader after finishing rendering
     shader->disable();
 
-	//END OF ENTITYMESH RENDER
-	Entity::render(camera);
+    //END OF ENTITYMESH RENDER
+    Entity::render(camera);
 };
 
 void EntityMesh::update(float elapsed_time) {
-	Entity::update(elapsed_time);
-    
+    Entity::update(elapsed_time);
+
 };

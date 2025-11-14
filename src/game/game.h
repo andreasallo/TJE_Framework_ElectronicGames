@@ -33,7 +33,7 @@ public:
 	bool must_exit;
 
 	//world
-	World* world;
+	//World* world;
 
 	//stage
 	Stage* current_stage;

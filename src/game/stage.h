@@ -37,11 +37,17 @@ class PlayStage : public Stage {
 public:
 	eStage type = PLAY_STAGE;
 
+	/*
 	Vector3 camera_current_eye;
 	Vector3 camera_current_center;
 	bool first_frame = true;
+	*/
 
-	PlayStage() {}
+	class World* world = nullptr;
+
+	PlayStage();
+
+	
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed, Camera* camera);

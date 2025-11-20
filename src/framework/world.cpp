@@ -12,6 +12,7 @@
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 #include "scene_parser.h"
+#include "framework/audio.h"
 
 #include <random>
 
@@ -25,7 +26,7 @@
 
 World::World() {
 	instance = this;
-
+	Audio::Init();
 	//camera = new Camera();
 	camera = Game::instance->camera;
 
@@ -69,19 +70,19 @@ World::World() {
 	if (player) {
 		smoothedTarget = player->model.getTranslation();
 	}
-	
 
-	/*
+
+	
 	//LOAD SKYBOX
 	{
 		Texture* cube_texture = new Texture();
 		cube_texture->loadCubemap("ProbaCubeMap", {
-			"data/Standard_cube/px.png",
-			"data/Standard_cube/nx.png",
-			"data/Standard_cube/ny.png",
-			"data/Standard_cube/py.png",
-			"data/Standard_cube/pz.png",
-			"data/Standard_cube/nz.png"
+			"data/space_cube/px.png",
+			"data/space_cube/nx.png",
+			"data/space_cube/ny.png",
+			"data/space_cube/py.png",
+			"data/space_cube/pz.png",
+			"data/space_cube/nz.png"
 			});
 
 		Material cubemap_material;
@@ -91,7 +92,7 @@ World::World() {
 		skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
 		//skybox->culling = false;
 
-	}*/
+	}
 
 	/*
 	if (!root) root = new Entity();
@@ -106,6 +107,8 @@ World::World() {
 	test_mesh->createCube(); // Crea un cubo perfecto por código
 	player = new Player(test_mesh, player_material, "player");
 	addEntity(player);*/
+
+	
 }
 
 void World::render(Camera* camera) {
@@ -153,9 +156,11 @@ void World::update(float delta_time)
 	// Actualitzar càmera
 	updateCamera(delta_time);
 
+
 	//Asteroid.
 	genAsteroid();
 	asteroid_root->update(delta_time);
+
 
 	// Actualitzar resta d’entitats
 	for (auto e : entities_to_destroy) {
@@ -173,18 +178,37 @@ void World::updateCamera(float dt)
 	Vector3 front = player->model.frontVector().normalize();
 
 	// MOOTHING
-	smoothedTarget = smoothedTarget * 0.9f + planePos * 0.1f;
+	//smoothedTarget = smoothedTarget * 0.9f + planePos * 0.1f;
 
 	//POSICIÓ CÀMERA
-	Vector3 cam_offset=Vector3(0.0f, 0.3f, -10.2f);
+	//Vector3 cam_offset=Vector3(0.0f, 0.3f, -10.2f);
 
-	Vector3 eye =smoothedTarget +front * cam_offset.z +Vector3(0.0f, cam_offset.y, 0.0f);
+	//Vector3 eye =smoothedTarget +front * cam_offset.z +Vector3(0.0f, cam_offset.y, 0.0f);
 
-	Vector3 center = smoothedTarget;
+	//Vector3 center = smoothedTarget;
 
+	//Vector3 rotatedUp = player->model.rotateVector(Vector3(0, 1, 0));
+	//camera->lookAt(eye, center, rotatedUp);
 	Vector3 rotatedUp = player->model.rotateVector(Vector3(0, 1, 0));
-	camera->lookAt(eye, center, rotatedUp);
+	Vector3 cam_offset(0.0f, 0.3f, -15.2f);
+	Vector3 new_eye = planePos
+		+ front * cam_offset.z
+		+ Vector3(0, cam_offset.y, 0);
+	Vector3 new_center = planePos;
+	float k = explerpFactor(dt, 4.0f);
+	if (firstFrame)
+	{
+		smoothedEye = new_eye;
+		smoothedCenter = new_center;
+		firstFrame = false;
+	}
+
+	smoothedEye = lerp(smoothedEye, new_eye, k);
+	smoothedCenter = lerp(smoothedCenter, new_center, k);
+	
+	camera->lookAt(smoothedEye, smoothedCenter, rotatedUp);
 }
+
 
 void World::addEntity(Entity* entity) {
 	root->addChild(entity);
@@ -345,3 +369,4 @@ void World::update(float delta_time) {
 	}
 	entities_to_destroy_clear();
 }*/
+

@@ -26,7 +26,13 @@ public:
 
 	World();
 	static World* getInstance() { return instance; };
+	
+	
+	Vector3 smoothedEye;
+	Vector3 smoothedCenter;
 
+	// Per inicialitzar la càmera el primer frame
+	bool firstFrame = true;
 
 	Camera* camera = nullptr;
 	Entity* root = nullptr;
@@ -59,12 +65,3 @@ public:
 	void entities_to_destroy_clear();
 
 };
-
-
-
-
-
-
-
-
-

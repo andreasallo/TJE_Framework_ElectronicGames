@@ -1,8 +1,7 @@
 #pragma once
 
 #include "framework/entities/entityMesh.h"
-
-#include "framework/entities/entityMesh.h"
+#include "framework/entities/entityCollider.h"
 
 //hereda de EntityMesh
 
@@ -12,7 +11,7 @@ class Mesh;
 class Material;
 class Camera;
 
-class Player : public EntityMesh {
+class Player : public EntityCollider {
 private:
 
 
@@ -28,6 +27,11 @@ private:
 	float acceleration = 40.0f;  // Qué tan rápido acelera
 	float rotation_speed = 1.5f; // Velocidad de giro
 
+	
+	float visualPitch = 0.0f;
+	float visualRoll = 0.0f;
+
+
 	const Vector3& getMovementDirection();
 
 
@@ -41,7 +45,20 @@ public:
 
 	void render(Camera* camera) override;
 	void update(float delta_time) override;
+	void render(Camera* camera) override;
 
+	Vector3 position;
+
+	float sphere_radius = 1.2f;
+	float height = 0.6f;
+
+	float lateralSpeed = 8.0f;
+
+	int lives = 3;
+
+	// Límits del túnel
+	float minX = -12.0f, maxX = 12.0f;
+	float minY = -6.0f, maxY = 20.0f;
 
 	void SetRenderMesh(bool new_render_mesh) { render_mesh = new_render_mesh; }
 	bool canMove(const Vector3& new_position);

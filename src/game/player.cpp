@@ -1,4 +1,4 @@
-
+ï»¿
 //front=nYaw.frontVector;
 //right=-nYaw.rightVector;
 
@@ -24,9 +24,13 @@
 Player* Player::instance = nullptr;
 
 Player::Player(Mesh* mesh, const Material& material, const std::string& name)
-    : EntityMesh(mesh, material, name)
+    : EntityCollider(mesh, material, name)
 {
     instance = this;
+    layer = eCollisionFilter::PLAYER;
+
+	position = model.getTranslation();
+	
 }
 
 void Player::render(Camera* camera)
@@ -60,7 +64,7 @@ void Player::render(Camera* camera)
    
 const Vector3& Player::getMovementDirection() {
 
-    // Calcular direcció de moviment segons càmera
+    // Calcular direcciï¿½ de moviment segons cï¿½mera
     Camera* camera = World::getInstance()->camera;
     Vector3 move_dir(0.0f, 0.0f, 0.0f);
     Matrix44 mYaw;
@@ -76,64 +80,6 @@ const Vector3& Player::getMovementDirection() {
     return move_dir.normalize();
 }
 
-
-void Player::update(float delta_time)
-{
-
-    //PER ACCELARACIO PER QUAN UTILITZI EL TURBO
-    /*if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) {
-        targetSpeed = 50.0f; // Velocidad turbo
-    }
-    else {
-        targetSpeed = 20.0f; // Velocidad normal
-    }*/
-
-	targetSpeed = 0.0f; // Velocidad constante
-
-    
-    //velocidad poco a poco
-    //speed = speed + (targetSpeed - speed) * delta_time * 2.0f;
-	speed = lerp(speed, targetSpeed, 2.0f * delta_time);
-    
-    Vector3 old_position = model.getTranslation();
-    model.translate(0.0f, 0.0f, speed * delta_time);
-    Vector3 new_position = model.getTranslation();
-
-    if (canMove(new_position) == false) {
-        model.setTranslation(old_position);
-        //detener velocidad si chocas?????????????
-
-    }
-    
-    float rot_speed_adjusted = 90.0f * delta_time; // Velocidad de giro
-    float rad_factor = (float)DEG2RAD;
-
-    
-    //float rot_speed_adjusted = rotation_speed * delta_time * 50.0f; // Ajustado para delta_time
-
-    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) {
-        model.rotate(rot_speed_adjusted * rad_factor, Vector3(-1, 0, 0)); // Morro arriba
-    }
-    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) {
-        model.rotate(rot_speed_adjusted * rad_factor, Vector3(1, 0, 0));  // Morro abajo
-    }
-
-    
-    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) {
-        model.rotate(rot_speed_adjusted * rad_factor, Vector3(0, -1, 0)); // Girar izq
-        model.rotate(rot_speed_adjusted * 0.5f * rad_factor, Vector3(0, 0, 1)); // Inclinar un poco
-    }
-    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) {
-        model.rotate(rot_speed_adjusted * rad_factor, Vector3(0, 1, 0)); // Girar der
-        model.rotate(rot_speed_adjusted * 0.5f * rad_factor, Vector3(0, 0, -1)); // Inclinar un poco
-    }
-
-    //new_eye = lerp(old_eye, new_eye, lerp_factor);
-
-
-    // Actualizar matriz global
-    EntityMesh::update(delta_time);
-}
 
 bool Player::canMove(const Vector3& new_position) {
 
@@ -161,102 +107,166 @@ void Player::collison(Vector3& position) {
         Mesh* mesh =
         // Check if collides with wall using sphere (radius = 1)
         if (mesh->testSphereCollision(entity->model, character_center, 1.0, col_point, col_normal)) {
-            std::cout << “Collision!” << std::endl;
+            std::cout << ï¿½Collision!ï¿½ << std::endl;
         }
     }
 }
 */
 
-/*void Player::update(float delta_time)
-{
-    Vector3 position = model.getTranslation();
-    Camera* camera = Game::instance->camera;
+   
+const Vector3& Player::getMovementDirection() {
 
-    velocity = { 0.0f,0.0f,0.0f };
+    // Calcular direcciÃ³ de moviment segons cÃ mera
+    Camera* camera = World::getInstance()->camera;
+    Vector3 move_dir(0.0f, 0.0f, 0.0f);
+    Matrix44 mYaw;
+    mYaw.setRotation(camera->yaw, Vector3(0, 1, 0));
+    Vector3 front = mYaw.frontVector();
+    Vector3 right = -mYaw.rightVector();
 
-    Vector3 move_dir = getMovementDirection();
+    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) move_dir -= front;
+    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) move_dir += front;
+    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) move_dir -= right;
+    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) move_dir += right;
 
-    //velocity
-    float current_speed = speed;
-    move_dir += current_speed;
-    velocity += move_dir;
-
-    //still no colision
-    position += velocity * delta_time;
-
-
-
-    //rotate player model based on camera yaw
-    if (velocity.length() > 0.0f) {
-
-        Vector3 dir = velocity;
-        dir.normalize();
-        float delta_yaw = atan2(-velocity.x, velocity.z);
-
-        float smoothing = 0.1f;
-        float new_yaw = lerpAngleRad(camera->yaw + delta_yaw, delta_yaw, smoothing);
-        model.setRotation(new_yaw, Vector3(0, 1, 0));
-
-        //player getiona su movimiento, world solo la camera se mueve
-
-        //model.rotate(camera->yaw, Vector3(0, 1, 0));  // gira el model segons càmera
-
-        //update new position
-        model.setTranslation(position);
-        EntityMesh::update(delta_time); // actualitza base
-    }
-    // Mou el jugador
-    //model.translate(velocity.x, velocity.y, velocity.z);
-}*/
+    return move_dir.normalize();
+}
 
 /*
-
 void Player::update(float delta_time)
 {
-    //Obtener los vectores de orientación actuales del avión
-    Vector3 position = model.getTranslation();
-    Vector3 front = model.frontVector().normalize();
-    Vector3 up = model.topVector().normalize();
-    Vector3 right = model.rightVector().normalize();
 
-    float roll_speed = 50.0f;
-
-    //Controlar la ROTACIÓN con las teclas
-
-    //pitch
-    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) {
-        model.rotate(pitch_speed * delta_time, right);
+    //PER ACCELARACIO PER QUAN UTILITZI EL TURBO
+    if (Input::isKeyPressed(SDL_SCANCODE_LSHIFT)) {
+        targetSpeed = 50.0f; // Velocidad turbo
     }
-    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) {
-        model.rotate(-pitch_speed * delta_time, right);
+    else {
+        targetSpeed = 20.0f; // Velocidad normal
     }
 
-    //yaw and roll?
-    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) {
-        model.rotate(roll_speed* delta_time, front);
-        model.rotate(yaw_speed * 0.5f * delta_time, up);
-    }
-    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) {
-        model.rotate(-roll_speed * delta_time, front);
-        model.rotate(-yaw_speed * 0.5f * delta_time , up);
-    }
+    //variable q me diga si estoy en modo turbo. default_speed i normal_seppd.
 
+	targetSpeed = 15.0f; // Velocidad constante
+
+
+    position.x += move2.x * lateralSpeed * delta_time;
+    position.y += move2.y * lateralSpeed * delta_time;
+
+    // clamp dins lÃ­mits
+    if (position.x < minX) position.x = minX;
+    if (position.x > maxX) position.x = maxX;
+    if (position.y < minY) position.y = minY;
+    if (position.y > maxY) position.y = maxY;
+    
+    //velocidad poco a poco
+    //speed = speed + (targetSpeed - speed) * delta_time * 2.0f;
+	//interpolacion exponencial, lerp fa que suavitzi la velocitat
+    float k = explerpFactor(delta_time, 4.0f);   //4.0f â†’ resposta rÃ pida perÃ² suau
+    speed = lerp(speed, targetSpeed, k);
+
+    //explerpFactor -> usa delta time. DENTRO UPDATE USAR ESTE
+    
+    Vector3 old_position = model.getTranslation();
+    model.translate(0.0f, 0.0f, speed * delta_time);
+    Vector3 new_position = model.getTranslation();
+    
+    if (canMove(new_position) == false) {
+        model.setTranslation(old_position);
+        //detener velocidad si chocas?????????????
+        targetSpeed = 0.0f;
+    }
+    
+    float rot_speed_adjusted = 90.0f * delta_time; // Velocidad de giro
+    float rad_factor = (float)DEG2RAD;
 
     
-    front = model.frontVector().normalize();
+    //float rot_speed_adjusted = rotation_speed * delta_time * 50.0f; // Ajustado para delta_time
 
-    velocity = front * forward_speed;
-
-
-    Vector3 new_position = position + velocity * delta_time;
-
-
-    // 6. Comprobar colisiones ANTES de moverse
-    if (canMove(new_position)) {
-        position = new_position;
-        model.setTranslation(position);
+    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) {
+        model.rotate(rot_speed_adjusted * rad_factor, Vector3(-1, 0, 0)); // Morro arriba
+    }
+    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) {
+        model.rotate(rot_speed_adjusted * rad_factor, Vector3(1, 0, 0));  // Morro abajo
     }
 
+    
+    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) {
+        model.rotate(rot_speed_adjusted * rad_factor, Vector3(0, -1, 0)); // Girar izq
+        model.rotate(rot_speed_adjusted * 0.5f * rad_factor, Vector3(0, 0, 1)); // Inclinar un poco
+    }
+    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) {
+        model.rotate(rot_speed_adjusted * rad_factor, Vector3(0, 1, 0)); // Girar der
+        model.rotate(rot_speed_adjusted * 0.5f * rad_factor, Vector3(0, 0, -1)); // Inclinar un poco
+    }
 
+    
+
+
+    // Actualizar matriz global
     EntityMesh::update(delta_time);
 }*/
+
+void Player::update(float dt)
+{
+    // ---- INPUT ----
+
+    float x = 0, y = 0;
+    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT))  x += 1.0f;
+    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) x -= 1.0f;
+    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP))    y -= 1.0f;
+    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN))  y += 1.0f;
+
+    Vector3 move(x, y, 0);
+    if (move.length() > 0.001f)
+        move.normalize();
+
+    // ---- MOVIMENT LATERAL ----
+    position.x += move.x * lateralSpeed * dt;
+    position.y += move.y * lateralSpeed * dt;
+
+    // ---- LIMITS ----
+    position.x = clamp(position.x, minX, maxX);
+    position.y = clamp(position.y, minY, maxY);
+
+    // ---- ROTACIÃ“ VISUAL ----
+    float maxRoll = 20.0f * DEG2RAD;
+    float maxPitch = 18.0f * DEG2RAD;
+
+    float desiredRoll = move.x * maxRoll;
+    float desiredPitch = move.y * maxPitch;
+
+    float k = explerpFactor(dt, 6.0f);
+
+    visualRoll = lerp(visualRoll, desiredRoll, k);
+    visualPitch = lerp(visualPitch, desiredPitch, k);
+
+    // ---- MODEL ----
+    model.setIdentity();
+    model.setTranslation(position);
+    model.rotate(visualPitch, Vector3(1, 0, 0));
+    model.rotate(visualRoll, Vector3(0, 0, 1));
+
+    EntityCollider::update(dt);
+}
+
+void Player::render(Camera* camera)
+{
+    EntityCollider::render(camera);
+}
+
+bool Player::canMove(const Vector3& new_position) {
+
+    std::vector<sCollisionData> collisions;
+    World* world = World::getInstance();
+
+    bool collided = false;
+
+    for (Entity* e : world->root->children) {
+        if (e != this && Collision::TestEntitySphere(e, sphere_radius, new_position + Vector3(0.0f, height, 0.0f), collisions, eCollisionFilter::SCENARIO)) {
+            return false;
+        }
+    }
+    return true;
+
+}
+

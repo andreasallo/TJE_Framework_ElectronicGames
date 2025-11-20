@@ -50,7 +50,7 @@ public:
 
 	PlayStage();
 
-	
+
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed, Camera* camera);

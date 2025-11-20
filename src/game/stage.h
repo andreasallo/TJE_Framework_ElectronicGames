@@ -26,6 +26,9 @@ class MenuStage : public Stage {
 public:
 	eStage type = MAIN_MENU;
 
+	int selected_option = 0;
+	SDL_Event event;
+
 	MenuStage() {}
 
 	void render(Camera* camera);

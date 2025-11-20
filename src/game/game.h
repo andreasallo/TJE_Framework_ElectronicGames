@@ -14,6 +14,7 @@
 
 class Stage;
 class World;
+class Audio;
 
 class Game
 {
@@ -34,6 +35,10 @@ public:
 
 	//world
 	//World* world;
+
+	//audio
+	//Llista de àudios???
+	Audio* audio;
 
 	//stage
 	Stage* current_stage;
@@ -66,6 +71,7 @@ public:
 	
 	//metodes get !!!
 	static Game* getInstance() { return instance; };
+	static Game* getEvent() {};
 	//static EntityMesh* getSkybox() { return instance->skybox; };
 	//static Entity* getRoot() { return instance->root; };
 

@@ -28,10 +28,7 @@ private:
 	float acceleration = 40.0f;  // Qué tan rápido acelera
 	float rotation_speed = 1.5f; // Velocidad de giro
 
-	
-
 	const Vector3& getMovementDirection();
-
 
 
 public:
@@ -42,13 +39,14 @@ public:
 	static Player* getInstance() { return instance; }
 
 
-	//void render(Camera* camera) override;
+	void render(Camera* camera) override;
 	void update(float delta_time) override;
 
 
 	void SetRenderMesh(bool new_render_mesh) { render_mesh = new_render_mesh; }
 	bool canMove(const Vector3& new_position);
-	void isGrounded(const Vector3& new_position, float max_ray_dist, Vector3& col_point);
+	void collison(Vector3& position);
+	//void isGrounded(const Vector3& new_position, float max_ray_dist, Vector3& col_point);
 
 	//for(Entity* e: world->root->children){
 

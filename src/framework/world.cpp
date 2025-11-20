@@ -2,6 +2,7 @@
 #include "framework/framework.h"
 #include "framework/entities/entity.h"
 #include "framework/entities/entityMesh.h"
+#include "framework/entities/entityCollider.h"
 #include "framework/utils.h"
 #include "framework/camera.h"
 #include "framework/input.h"
@@ -11,6 +12,8 @@
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 #include "scene_parser.h"
+
+#include <random>
 
 //aqui se carga un avion 
 //ir hacia la z, ir hacia delante
@@ -30,22 +33,36 @@ World::World() {
 	root = new Entity();
 	root->name = "root";
 
+	asteroid_root = new Asteroid(); // asteroid
+	
+	/*
+	Mesh* cube = new Mesh();
+	Material mat;
+	cube->createCube(); // Crea un cubo perfecto por código
+
+	asteroid_root = new Asteroid(cube, mat);
+	asteroid_root->layer = eCollisionFilter::SCENARIO;
+	asteroid_root->isInstanced = true;
+	asteroid_root->model.setTranslation(Vector3(0, 0, 10));
+	*/
+	
 	Material player_material;
-	player_material.diffuse = Texture::Get("data/craft_speederA.mtl");
+	//player_material.diffuse = Texture::Get("data/craft_speederA.mtl");
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	//
-	player = new Player(Mesh::Get("data/craft_speederA.obj"), player_material, "player");
+	//player = new Player(Mesh::Get("data/craft_speederA.obj"), player_material, "player");
 	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
 	//player->model.scale(10.0f, 90.0f, 90.0f);
 
 	//PLAYER CUBE PLACEHOLDER
-	/*
+	/**/
 	Mesh* test_mesh = new Mesh();
 	test_mesh->createCube(); // Crea un cubo perfecto por código
 	player = new Player(test_mesh, player_material, "player");
+	player->model.setTranslation(0.0f, 10.0f, 0.0f);
 
 	addEntity(player);
-	*/
+	
 	SceneParser parser;
 	parser.parse("data/myscene.scene", root);
 
@@ -116,11 +133,108 @@ void World::render(Camera* camera) {
 	glDisable(GL_CULL_FACE);
 
 	root->render(camera);
+	//Asteroid
+	asteroid_root->render(camera);
+
+
 	// Draw the floor grid
 	drawGrid();
 
 	// Render the FPS, Draw Calls, etc
 	drawText(2, 2, getGPUStats(), Vector3(1, 1, 1), 2);
+}
+
+
+void World::update(float delta_time)
+{
+	// Actualitzar jugador
+	player->update(delta_time);
+
+	// Actualitzar càmera
+	updateCamera(delta_time);
+
+	//Asteroid.
+	genAsteroid();
+	asteroid_root->update(delta_time);
+
+	// Actualitzar resta d’entitats
+	for (auto e : entities_to_destroy) {
+		if (e->parent) {
+			e->parent->removeChild(e);
+		}
+		delete e;
+	}
+	entities_to_destroy_clear();
+}
+
+void World::updateCamera(float dt)
+{
+	Vector3 planePos = player->model.getTranslation();
+	Vector3 front = player->model.frontVector().normalize();
+
+	// MOOTHING
+	smoothedTarget = smoothedTarget * 0.9f + planePos * 0.1f;
+
+	//POSICIÓ CÀMERA
+	Vector3 cam_offset=Vector3(0.0f, 0.3f, -10.2f);
+
+	Vector3 eye =smoothedTarget +front * cam_offset.z +Vector3(0.0f, cam_offset.y, 0.0f);
+
+	Vector3 center = smoothedTarget;
+
+	Vector3 rotatedUp = player->model.rotateVector(Vector3(0, 1, 0));
+	camera->lookAt(eye, center, rotatedUp);
+}
+
+void World::addEntity(Entity* entity) {
+	root->addChild(entity);
+}
+
+void World::destroyEntity(Entity* entity) {
+	entities_to_destroy.push_back(entity);
+}
+
+void World::entities_to_destroy_clear() {
+	entities_to_destroy.clear();
+}
+
+
+//Asteroid
+bool World::genAsteroid() {
+	int rand = genRandom();
+	World* instance = getInstance();
+
+	if (rand % 13 == 0) {
+		Mesh* test_mesh = new Mesh();
+		Asteroid* new_asteroid = nullptr;
+		Material mat;
+
+		test_mesh->createCube(); // Crea un cubo perfecto por código
+
+		new_asteroid = new Asteroid(test_mesh, mat);
+		new_asteroid->layer = eCollisionFilter::SCENARIO;
+		new_asteroid->isInstanced = true;
+		new_asteroid->model.setTranslation(Vector3(0, 0, 10));
+
+		// Add entity to scene root
+		asteroid_root->addChild(new_asteroid);
+		has_asteroids = true;
+
+		std::cout << "ASTEROID GENERATED";
+
+		return true;
+	}
+	return false;
+}
+
+int World::genRandom() {
+	std::random_device rd; // obtain a random number from hardware
+	std::mt19937 gen(rd()); // seed the generator
+	std::uniform_int_distribution<> distr(1, 13); // define the range
+
+	int r = distr(gen);
+
+	return r;
 }
 
 /*
@@ -145,7 +259,7 @@ void World::update(float delta_time) {
 	else {
 
 		//UPDATE CAMERA CONTROLLER 1st person
-		
+
 		float mouse_factor = 0.005f;
 
 		camera->yaw -= Input::mouse_delta.x * delta_time * mouse_speed;
@@ -176,7 +290,7 @@ void World::update(float delta_time) {
 		//persona
 		Vector3 center = player_position;
 		Vector3 eye = center - front * orbit_distance;
-		
+
 		//AVIO
 		Vector3 eye = player->model * Vector3(0, 5, 10);
 		Vector3 center = player->model.getTranslation() - player->model.frontVector() * 10.0f;
@@ -189,8 +303,8 @@ void World::update(float delta_time) {
 
 		root->update(delta_time);
 		player->update(delta_time);
-		
-		
+
+
 		// --- Posición OBJETIVO de la cámara ---
 		Vector3 player_pos = player->model.getTranslation();
 		Vector3 player_front = player->model.frontVector();
@@ -231,54 +345,3 @@ void World::update(float delta_time) {
 	}
 	entities_to_destroy_clear();
 }*/
-
-
-void World::update(float delta_time)
-{
-	// Actualitzar jugador
-	player->update(delta_time);
-
-	// Actualitzar càmera
-	updateCamera(delta_time);
-
-	// Actualitzar resta d’entitats
-	for (auto e : entities_to_destroy) {
-		if (e->parent) {
-			e->parent->removeChild(e);
-		}
-		delete e;
-	}
-	entities_to_destroy_clear();
-}
-
-void World::updateCamera(float dt)
-{
-	Vector3 planePos = player->model.getTranslation();
-	Vector3 front = player->model.frontVector().normalize();
-
-	// MOOTHING
-	smoothedTarget = smoothedTarget * 0.9f + planePos * 0.1f;
-
-	//POSICIÓ CÀMERA
-	Vector3 cam_offset=Vector3(0.0f, 0.3f, -1.2f);
-
-	Vector3 eye =smoothedTarget +front * cam_offset.z +Vector3(0.0f, cam_offset.y, 0.0f);
-
-	Vector3 center = smoothedTarget;
-
-	camera->lookAt(eye, center, Vector3(0, 1, 0));
-}
-
-
-
-void World::addEntity(Entity* entity) {
-	root->addChild(entity);
-}
-
-void World::destroyEntity(Entity* entity) {
-	entities_to_destroy.push_back(entity);
-}
-
-void World::entities_to_destroy_clear() {
-	entities_to_destroy.clear();
-}

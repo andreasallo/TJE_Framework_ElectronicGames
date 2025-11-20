@@ -3,6 +3,7 @@
 #include "game/game.h"
 #include <vector>
 #include "framework/utils.h"
+#include "game/asteroid.h" //asteroid
 
 class Camera;
 class Player;
@@ -18,8 +19,6 @@ private:
 	//static World* instance;
 	Vector3 smoothedTarget;
 
-
-
 public:
 	static World* instance;
 
@@ -31,6 +30,8 @@ public:
 
 	Camera* camera = nullptr;
 	Entity* root = nullptr;
+	Asteroid* asteroid_root = nullptr;
+	bool has_asteroids = false;
 	Player* player = nullptr;
 
 	float camera_speed = 3.0f;
@@ -41,6 +42,10 @@ public:
 	Vector3 camera_current_eye;
 	Vector3 camera_current_center;
 	bool first_frame = true;
+	
+	//GameMechanic
+	int genRandom();
+	bool genAsteroid();
 
 	void render(Camera* camera);
 	void update(float delta_time);

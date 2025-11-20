@@ -9,6 +9,7 @@
 #include "framework/entities/entityMesh.h"
 #include "framework/entities/entity.h"
 
+#include "framework/audio.h"
 
 #include <cmath>
 #include <iostream>
@@ -23,8 +24,6 @@ World* World::instance = NULL;
 
 MenuStage* menu_stage;
 PlayStage* play_stage;
-
-
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -81,6 +80,11 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	current_stage = play_stage;
 
+	Audio::Init();
+
+	audio = new Audio();
+	//audio->Play("sounds/coin.wav");
+
 
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -119,8 +123,10 @@ void Game::onKeyDown(SDL_KeyboardEvent event)
 {
 	switch (event.keysym.sym)
 	{
-	case SDLK_ESCAPE: must_exit = true; break; //ESC key, kill the app
-	case SDLK_F1: Shader::ReloadAll(); break;
+	case SDLK_ESCAPE:
+		must_exit = true; break; //ESC key, kill the app
+	case SDLK_F1:
+		Shader::ReloadAll(); break;
 	}
 }
 

@@ -13,6 +13,7 @@
 #include "graphics/texture.h"
 #include "scene_parser.h"
 #include "framework/audio.h"
+#include "game/asteroidControl.h"
 
 #include <random>
 
@@ -34,8 +35,8 @@ World::World() {
 	root = new Entity();
 	root->name = "root";
 
-	asteroid_root = new Asteroid(); // asteroid
-	
+	//asteroid_root = new Asteroid(); // asteroid
+	asteroidControl.init();
 	/*
 	Mesh* cube = new Mesh();
 	Material mat;
@@ -48,24 +49,24 @@ World::World() {
 	*/
 	
 	Material player_material;
-	//player_material.diffuse = Texture::Get("data/craft_speederA.mtl");
+	player_material.diffuse = Texture::Get("data/craft_speederA.mtl");
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	//
-	//player = new Player(Mesh::Get("data/craft_speederA.obj"), player_material, "player");
+	player = new Player(Mesh::Get("data/craft_speederA.obj"), player_material, "player");
 	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
 	//player->model.scale(10.0f, 90.0f, 90.0f);
 
 	//PLAYER CUBE PLACEHOLDER
 	/**/
-	Mesh* test_mesh = new Mesh();
-	test_mesh->createCube(); // Crea un cubo perfecto por código
-	player = new Player(test_mesh, player_material, "player");
-	player->model.setTranslation(0.0f, 10.0f, 0.0f);
+	//Mesh* test_mesh = new Mesh();
+	//test_mesh->createCube(); // Crea un cubo perfecto por código
+	//player = new Player(player, player_material, "player");
+	//player->model.setTranslation(0.0f, 10.0f, 0.0f);
 
 	addEntity(player);
 	
-	SceneParser parser;
-	parser.parse("data/myscene.scene", root);
+	//SceneParser parser;
+	//parser.parse("data/myscene.scene", root);
 
 	if (player) {
 		smoothedTarget = player->model.getTranslation();
@@ -137,7 +138,7 @@ void World::render(Camera* camera) {
 
 	root->render(camera);
 	//Asteroid
-	asteroid_root->render(camera);
+	//asteroid_root->render(camera);
 
 
 	// Draw the floor grid
@@ -158,8 +159,10 @@ void World::update(float delta_time)
 
 
 	//Asteroid.
-	genAsteroid();
-	asteroid_root->update(delta_time);
+	//genAsteroid();
+	//asteroid_root->update(delta_time);
+
+	asteroidControl.update(delta_time);
 
 
 	// Actualitzar resta d’entitats
@@ -222,7 +225,7 @@ void World::entities_to_destroy_clear() {
 	entities_to_destroy.clear();
 }
 
-
+/*
 //Asteroid
 bool World::genAsteroid() {
 	int rand = genRandom();
@@ -259,7 +262,7 @@ int World::genRandom() {
 	int r = distr(gen);
 
 	return r;
-}
+}*/
 
 /*
 void World::update(float delta_time) {

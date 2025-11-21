@@ -81,21 +81,6 @@ const Vector3& Player::getMovementDirection() {
 }
 
 
-bool Player::canMove(const Vector3& new_position) {
-
-    std::vector<sCollisionData> collisions;
-    World* world = World::getInstance();
-
-    bool collided = false;
-
-    for (Entity* e : world->root->children) {
-        if (e != this && Collision::TestEntitySphere(e, sphere_radius, new_position + Vector3(0.0f, height, 0.0f), collisions, eCollisionFilter::SCENARIO)) {
-            return false;
-        }
-    }
-    return true;
-
-}
 
 /*
 void Player::collison(Vector3& position) {
@@ -114,23 +99,6 @@ void Player::collison(Vector3& position) {
 */
 
    
-const Vector3& Player::getMovementDirection() {
-
-    // Calcular direcció de moviment segons càmera
-    Camera* camera = World::getInstance()->camera;
-    Vector3 move_dir(0.0f, 0.0f, 0.0f);
-    Matrix44 mYaw;
-    mYaw.setRotation(camera->yaw, Vector3(0, 1, 0));
-    Vector3 front = mYaw.frontVector();
-    Vector3 right = -mYaw.rightVector();
-
-    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) move_dir -= front;
-    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) move_dir += front;
-    if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) move_dir -= right;
-    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) move_dir += right;
-
-    return move_dir.normalize();
-}
 
 /*
 void Player::update(float delta_time)
@@ -249,10 +217,6 @@ void Player::update(float dt)
     EntityCollider::update(dt);
 }
 
-void Player::render(Camera* camera)
-{
-    EntityCollider::render(camera);
-}
 
 bool Player::canMove(const Vector3& new_position) {
 

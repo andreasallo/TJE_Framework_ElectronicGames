@@ -18,9 +18,6 @@ private:
 	bool render_mesh = true;
 	Vector3 velocity = Vector3(0.0f);
 
-	
-	float sphere_radius = 1.5f; //probar valors
-	float height = 0.0f;
 
 	float speed = 0.0f;          // Velocidad actual
 	float targetSpeed = 0.0f;    // Velocidad a la que queremos llegar
@@ -45,7 +42,6 @@ public:
 
 	void render(Camera* camera) override;
 	void update(float delta_time) override;
-	void render(Camera* camera) override;
 
 	Vector3 position;
 

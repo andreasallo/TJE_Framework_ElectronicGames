@@ -29,7 +29,7 @@ public:
 	int selected_option = 0;
 	SDL_Event event;
 
-	MenuStage() {}
+	MenuStage();
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed, Camera* camera);

@@ -16,8 +16,20 @@ enum MenuOptions {
 };
 
 
-void MenuStage::render(Camera* camera) {
+MenuStage::MenuStage() {
 
+}
+
+void MenuStage::render(Camera* camera) {
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void MenuStage::update(double seconds_elapsed, Camera* camera) {   

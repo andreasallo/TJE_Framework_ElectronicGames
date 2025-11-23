@@ -22,7 +22,9 @@ public:
 	Material material;
 	Vector2 size = Vector2(0.0f, 0.0f);
 	Vector2 position = Vector2(0.0f, 0.0f);
-	eUIButtonID button_id;
+	eUIButtonID button_id = UI_BUTTON_UNIDENTIFIED;
+	bool is3D = false;
+	int mask = 0;
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed);

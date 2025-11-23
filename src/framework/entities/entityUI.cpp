@@ -5,33 +5,35 @@ EntityUI::EntityUI(	Vector2 new_size, const Material& material) {
 
 	this->material = material;
 
-	if (this->material.shader) {
-		//this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs"); /// ?
+	if (!this->material.shader) {
+		this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs" : nullptr);
 	}
 }
 
 EntityUI::EntityUI(Vector2 new_pos, Vector2 new_size, const Material& material, eUIButtonID new_button_id) {
 	position = new_pos;
 	size = new_size;
+	button_id = new_button_id;	
 	
 	mesh = new Mesh();
 	mesh->createQuad(position.x, position.y, size.x, size.y, true);
 	this->material = material;
 
-	if (this->material.shader) {
-		//this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs"); /// ?
+	if (!this->material.shader) {
+		this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs" : nullptr);
 	}
 }
 
 void EntityUI::render(Camera* camera) {
-	//PER ARREGLAR
-	Camera* camera2d;
-	int mask = 0;
-	bool is3D = false;
+	Game* instance = Game::instance;
+	Camera* camera2d = new Camera();
+	camera2d->view_matrix = Matrix44();
+	camera2d->setOrthographic(0, instance->window_width, instance->window_height, 0, -1, -1);
+	camera2d->updateProjectionMatrix();
 	Matrix44 viewproj = camera2d->viewprojection_matrix;
 
 	material.shader->setUniform("u_model", model);
-	material.shader->setUniform("u_viewprojection", viewproj);
+	material.shader->setUniform("u_viewprojection", viewproj); //viewproj = null??
 	material.shader->setUniform("u_color", material.color);
 	material.shader->setUniform("u_mask", mask);
 

@@ -82,10 +82,10 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	current_stage = play_stage;
 	
 	/*
-	Camera camera2D;
-	camera2D.view_matrix = Matrix44(); // Set View to identity
-	camera2D.setOrthographic(0, window_width, window_height, 0, -1, 1);
-	shader->setUniform("u_viewprojection", camera2D.viewprojection_matrix);
+	camera2d;
+	camera2d->view_matrix = Matrix44(); // Set View to identity
+	camera2d->setOrthographic(0, window_width, window_height, 0, -1, 1);
+	//shader->setUniform("u_viewprojection", camera2d->viewprojection_matrix);
 	*/
 
 	Audio::Init();

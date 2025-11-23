@@ -45,6 +45,7 @@ public:
 
 	//some vars
 	Camera* camera; //our global camera
+	Camera* camera2d;
 	bool mouse_locked; //tells if the mouse is locked (not seen)
 
 	//some more vars (abans globals)

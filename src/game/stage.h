@@ -1,11 +1,13 @@
 #pragma once
 
+#include "game/game.h"
 #include "framework/camera.h"
 #include "framework/world.h"
-
+#include "framework/entities/entityUI.h"
 
 class Game;
 class World;
+class EntityUI;
 
 enum eStage {
 	MAIN_MENU,
@@ -14,6 +16,9 @@ enum eStage {
 
 class Stage {
 public:
+
+	//Game* instance = Game::instance;
+
 	virtual void render(Camera* camera) {} // o = 0, si vols que les altres classes stage facin render si o si
 	virtual void update(double seconds_elapsed, Camera* camera) {}
 
@@ -25,6 +30,8 @@ public:
 class MenuStage : public Stage {
 public:
 	eStage type = MAIN_MENU;
+
+	//EntityUI* start_button;
 
 	int selected_option = 0;
 	SDL_Event event;
@@ -48,9 +55,9 @@ public:
 
 	class World* world = nullptr;
 
+	EntityUI* health_bar = nullptr;
+
 	PlayStage();
-
-
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed, Camera* camera);

@@ -10,7 +10,7 @@ public:
     float spawnTimer = 0.0f;
     float spawnInterval = 1.2f; // cada 1.2s apareix un meteorit
 
-    Mesh* asteroidMesh;
+    Mesh* asteroidMesh=nullptr;
     Material asteroidMat;
 
     void init();

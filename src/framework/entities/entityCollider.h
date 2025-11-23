@@ -18,11 +18,18 @@ public:
 	int layer = eCollisionFilter::NONE; 
 	eColliderType collider_type = COLLIDER_SPHERE;
 
+	float collision_radius = 1.0f; // per a esfera
+	bool toDelete = false;
 
 	// Constructor
 	EntityCollider() : EntityMesh() {}
 	EntityCollider(Mesh* mesh, const Material& material, const std::string& name = "")
 		: EntityMesh(mesh, material, name) {
+	}
+
+	Vector3 getColliderCenter() {
+		Vector3 center = model.getTranslation();
+		return center;
 	}
 	
 

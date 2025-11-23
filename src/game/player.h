@@ -2,6 +2,8 @@
 
 #include "framework/entities/entityMesh.h"
 #include "framework/entities/entityCollider.h"
+#include "game/asteroid.h"
+#include "game/asteroidControl.h"
 
 //hereda de EntityMesh
 
@@ -45,22 +47,33 @@ public:
 
 	Vector3 position;
 
-	float sphere_radius = 1.2f;
-	float height = 0.6f;
+	//float sphere_radius = 0.8f;
+	//float height = 0.6f;
 
 	float lateralSpeed = 8.0f;
 
 	int lives = 3;
+	float collision_radius = 0.6f;
 
 	// Límits del túnel
 	float minX = -12.0f, maxX = 12.0f;
 	float minY = -6.0f, maxY = 20.0f;
 
+	//TURBO VARIABLES
+	bool turbo = false;
+	float turbo_timer = 0.0f;
+	int coins_collected = 0;
+	float turbo_duration = 2.0f; // Duración del turbo en segundos
+
 	void SetRenderMesh(bool new_render_mesh) { render_mesh = new_render_mesh; }
 	bool canMove(const Vector3& new_position);
 	void collison(Vector3& position);
+	void handleImpact(Asteroid* asteroid);
 	//void isGrounded(const Vector3& new_position, float max_ray_dist, Vector3& col_point);
 
 	//for(Entity* e: world->root->children){
+
+	// retorna centre global per col·lisions (usa el del EntityCollider)
+	Vector3 getCollisionCenter() const { return model.getTranslation(); }
 
 };

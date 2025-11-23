@@ -3,8 +3,10 @@
 #include "game/game.h"
 #include <vector>
 #include "framework/utils.h"
-#include "game/asteroid.h" //asteroid
+#include "game/asteroid.h"
 #include "game/asteroidControl.h"
+#include "game/ring.h"
+#include "game/ringControl.h"
 
 class Camera;
 class Player;
@@ -42,6 +44,7 @@ public:
 	Player* player = nullptr;
 
 	AsteroidControl asteroidControl;
+	RingControl ringControl;
 
 
 	float camera_speed = 3.0f;

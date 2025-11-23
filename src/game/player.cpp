@@ -18,6 +18,9 @@
 #include "graphics/shader.h"
 #include "graphics/mesh.h"
 #include <cmath>
+#include "game/asteroid.h"
+
+
 
 #define RENDER_DEBUG
 
@@ -46,9 +49,12 @@ void Player::render(Camera* camera)
     shader->enable();
 
     Matrix44 m;
-    m.setTranslation(getGlobalMatrix().getTranslation());
-    m.translate(0.0f, height, 0.0f);
-    m.scale(sphere_radius, sphere_radius, sphere_radius);
+    float pivot_offset = -0.29f;  // ajusta fins que quedi al centre
+    m.setTranslation(getGlobalMatrix().getTranslation() + Vector3(0, -pivot_offset, 0));
+
+    //m.setTranslation(getGlobalMatrix().getTranslation());
+    m.scale(collision_radius, collision_radius, collision_radius);
+    
 
     shader->setUniform("u_color", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
     shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
@@ -214,23 +220,62 @@ void Player::update(float dt)
     model.rotate(visualPitch, Vector3(1, 0, 0));
     model.rotate(visualRoll, Vector3(0, 0, 1));
 
+    //----turbo
+    if (turbo)
+    {
+        turbo_timer -= dt;
+        if (turbo_timer <= 0.0f)
+        {
+            turbo = false;
+            std::cout << "Turbo OFF" << std::endl;
+        }
+    }
+
     EntityCollider::update(dt);
 }
 
+void Player::handleImpact(Asteroid* asteroid)
+{
 
-bool Player::canMove(const Vector3& new_position) {
+    World* world = World::instance;
+
+    if (lives > 0)
+    {
+        lives--;
+        std::cout << "¡IMPACTO! Vidas restantes: " << lives << std::endl;
+
+        //Destruir el meteorito con el que se ha chocado
+        World::getInstance()->destroyEntity(asteroid);
+        asteroid->toDelete = true; // Marca para que AsteroidControl lo limpie
+
+       
+
+        if (lives <= 0) //DEAD
+        {
+            std::cout << "GAME OVER" << std::endl;
+            //World::instance->gameOver();
+        }
+    }
+}
+
+/*bool Player::canMove(const Vector3& new_position) {
 
     std::vector<sCollisionData> collisions;
     World* world = World::getInstance();
 
-    bool collided = false;
+    int collision_filter = eCollisionFilter::ENEMY;
 
     for (Entity* e : world->root->children) {
         if (e != this && Collision::TestEntitySphere(e, sphere_radius, new_position + Vector3(0.0f, height, 0.0f), collisions, eCollisionFilter::SCENARIO)) {
-            return false;
+            Asteroid* asteroid = dynamic_cast<Asteroid*>(e);
+            if (asteroid) {
+                // Llama a la lógica de impacto que resta vidas y destruye el asteroide.
+                handleImpact(asteroid);
+            }
         }
     }
     return true;
+}*/
 
-}
-
+//collided |=collision:testEntitySphere(e,sphere_radius,new_position+Vector3(0.0f,height, 0.0f), collisions, eCollisionFilter::SCENARIO);
+//return !collided

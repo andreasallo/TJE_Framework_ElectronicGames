@@ -14,6 +14,7 @@
 #include "scene_parser.h"
 #include "framework/audio.h"
 #include "game/asteroidControl.h"
+#include "game/ringControl.h"
 
 #include <random>
 
@@ -37,6 +38,7 @@ World::World() {
 
 	//asteroid_root = new Asteroid(); // asteroid
 	asteroidControl.init();
+	ringControl.init();
 	/*
 	Mesh* cube = new Mesh();
 	Material mat;
@@ -53,6 +55,7 @@ World::World() {
 	//player_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	//
 	player = new Player(Mesh::Get("data/craft_speederA.obj"), player_material, "player");
+	player->layer = eCollisionFilter::PLAYER;
 	//player->model.setTranslation(0.0f, 40.0f, 0.0f);
 	//player->model.scale(10.0f, 90.0f, 90.0f);
 
@@ -163,7 +166,7 @@ void World::update(float delta_time)
 	//asteroid_root->update(delta_time);
 
 	asteroidControl.update(delta_time);
-
+	ringControl.update(delta_time);
 
 	// Actualitzar resta d’entitats
 	for (auto e : entities_to_destroy) {

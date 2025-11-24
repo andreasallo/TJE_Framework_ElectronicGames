@@ -25,15 +25,10 @@ EntityUI::EntityUI(Vector2 new_pos, Vector2 new_size, const Material& material, 
 }
 
 void EntityUI::render(Camera* camera) {
-	Game* instance = Game::instance;
-	Camera* camera2d = new Camera();
-	camera2d->view_matrix = Matrix44();
-	camera2d->setOrthographic(0, instance->window_width, instance->window_height, 0, -1, -1);
-	camera2d->updateProjectionMatrix();
-	Matrix44 viewproj = camera2d->viewprojection_matrix;
+	Matrix44 viewproj = camera->viewprojection_matrix;
 
 	material.shader->setUniform("u_model", model);
-	material.shader->setUniform("u_viewprojection", viewproj); //viewproj = null??
+	material.shader->setUniform("u_viewprojection", viewproj); //error
 	material.shader->setUniform("u_color", material.color);
 	material.shader->setUniform("u_mask", mask);
 
@@ -55,7 +50,7 @@ void EntityUI::render(Camera* camera) {
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
-	Entity::render(camera2d);
+	Entity::render(camera);
 }
 
 void EntityUI::update(double seconds_elapsed) {

@@ -107,7 +107,7 @@ PlayStage::PlayStage() {
     Vector2 size = Vector2(instance->window_width/6, instance->window_height/6);
 
     Material material;
-    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/health_bar.fs");
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
     material.color = Vector4::WHITE;
 
     health_bar = new EntityUI(Vector2(0, 0), size, material, eUIButtonID::UI_BUTTON_UNIDENTIFIED);
@@ -116,9 +116,16 @@ PlayStage::PlayStage() {
 }
 
 void PlayStage::render(Camera* camera) {
+    Camera* camera2d = Game::instance->camera2d;
     if (world) {
         world->render(camera);
-        //health_bar->render(camera);
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        //health_bar->render(camera2d);
     }
 }
 

@@ -63,7 +63,7 @@ public:
 	bool turbo = false;
 	float turbo_timer = 0.0f;
 	int coins_collected = 0;
-	float turbo_duration = 2.0f; // Duración del turbo en segundos
+	float turbo_duration = 3.0f; // Duración del turbo en segundos
 
 	void SetRenderMesh(bool new_render_mesh) { render_mesh = new_render_mesh; }
 	bool canMove(const Vector3& new_position);

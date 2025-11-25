@@ -1,37 +1,34 @@
 #include "framework/entities/entityUI.h"
 
-EntityUI::EntityUI(	Vector2 new_size, const Material& material) {
+EntityUI::EntityUI(Vector2 new_size, const Material& material) {
 	size = new_size;
 
 	this->material = material;
 
-	if (this->material.shader) {
-		//this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs"); /// ?
+	if (!this->material.shader) {
+		this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs" : nullptr);
 	}
 }
 
 EntityUI::EntityUI(Vector2 new_pos, Vector2 new_size, const Material& material, eUIButtonID new_button_id) {
 	position = new_pos;
 	size = new_size;
-	
+	button_id = new_button_id;
+
 	mesh = new Mesh();
 	mesh->createQuad(position.x, position.y, size.x, size.y, true);
 	this->material = material;
 
-	if (this->material.shader) {
-		//this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs"); /// ?
+	if (!this->material.shader) {
+		this->material.shader = Shader::Get("data/shaders/basic.vs", material.diffuse ? "data/shaders/fragment.fs" : nullptr);
 	}
 }
 
 void EntityUI::render(Camera* camera) {
-	//PER ARREGLAR
-	Camera* camera2d;
-	int mask = 0;
-	bool is3D = false;
-	Matrix44 viewproj = camera2d->viewprojection_matrix;
+	Matrix44 viewproj = camera->viewprojection_matrix;
 
 	material.shader->setUniform("u_model", model);
-	material.shader->setUniform("u_viewprojection", viewproj);
+	material.shader->setUniform("u_viewprojection", viewproj); //error
 	material.shader->setUniform("u_color", material.color);
 	material.shader->setUniform("u_mask", mask);
 
@@ -43,7 +40,7 @@ void EntityUI::render(Camera* camera) {
 		Mesh quad;
 		quad.createQuad(position.x, position.y, size.x, size.y, true);
 		quad.render(GL_TRIANGLES);
-		
+
 	}
 	else {
 		mesh->render(GL_TRIANGLES);
@@ -53,7 +50,7 @@ void EntityUI::render(Camera* camera) {
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
-	Entity::render(camera2d);
+	Entity::render(camera);
 }
 
 void EntityUI::update(double seconds_elapsed) {
@@ -62,11 +59,11 @@ void EntityUI::update(double seconds_elapsed) {
 	if (button_id != UI_BUTTON_UNIDENTIFIED &&
 		mouse_pos.x > (position.x - size.x * 0.5f) &&
 		mouse_pos.x < (position.x + size.x * 0.5f) &&
-		mouse_pos.y > (position.y - size.y * 0.5f) &&
+		mouse_pos.y >(position.y - size.y * 0.5f) &&
 		mouse_pos.y < (position.y + size.y * 0.5f)) {
 
 		material.color = Vector4(1.25);
-		
+
 		if (Input::wasMouseReleased(SDL_BUTTON_LEFT)) {
 			switch (button_id)
 			{

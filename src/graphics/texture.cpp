@@ -707,7 +707,7 @@ bool Image::saveTGA(const char* filename, bool flip_y)
 void Image::flipY()
 {
 	assert(data);
-	int row_size = 4 * width;
+	int row_size = bytes_per_pixel * width;
 	uint8* temp_row = new uint8[row_size];
 #pragma omp simd
 	for (int y = 0; y < height * 0.5; y += 1)

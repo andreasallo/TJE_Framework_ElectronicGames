@@ -10,6 +10,8 @@
 void Ring::render(Camera* camera)
 {
     EntityMesh::render(camera);
+    
+
 
 #ifdef RENDER_DEBUG
     Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");

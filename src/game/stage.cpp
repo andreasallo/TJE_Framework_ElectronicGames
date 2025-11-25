@@ -8,6 +8,7 @@
 #include <cmath>
 #include "framework/world.h"
 #include "framework/camera.h"
+#include "graphics/texture.h"
 
 enum MenuOptions {
     MENU_START,
@@ -17,7 +18,13 @@ enum MenuOptions {
 
 
 MenuStage::MenuStage() {
+    background.loadTGA("data/2.tga");
 
+    background.flipY();
+
+    if (background.data) {
+        background_tex = new Texture(&background);
+    }
 }
 
 void MenuStage::render(Camera* camera) {
@@ -26,8 +33,13 @@ void MenuStage::render(Camera* camera) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    if (background_tex) {
+		//toViewport dibuixa la textura a tota la pantalla
+        background_tex->toViewport();
+    }
+
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE); 
     glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

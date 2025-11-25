@@ -2,6 +2,7 @@
 
 #include "framework/camera.h"
 #include "framework/world.h"
+#include "graphics/texture.h"
 
 
 class Game;
@@ -28,6 +29,8 @@ public:
 
 	int selected_option = 0;
 	SDL_Event event;
+	Image background;
+	Texture* background_tex = nullptr;
 
 	MenuStage();
 

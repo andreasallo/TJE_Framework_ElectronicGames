@@ -33,10 +33,14 @@ void MenuStage::render(Camera* camera) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
     if (background_tex) {
 		//toViewport dibuixa la textura a tota la pantalla
         background_tex->toViewport();
     }
+
+    //start_button->render(camera);
+
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE); 
@@ -45,8 +49,10 @@ void MenuStage::render(Camera* camera) {
 }
 
 void MenuStage::update(double seconds_elapsed, Camera* camera) {   
+
+    //start_button->update();
     //SDL_PollEvent(&event);
-    Game* instance = Game::instance;
+    //Game* instance = Game::instance;
     
     // W- selected_option = (selected_option - 1 + MENU_TOTAL) % MENU_TOTAL on menu total és la posició final del menú
     // S- selected_option = (selected_option + 1) % MENU_TOTAL
@@ -100,27 +106,47 @@ void MenuStage::update(double seconds_elapsed, Camera* camera) {
     */
     
     // ANTIC
-    /**/
+    /*
     if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
         instance->audio->Play("sounds/coin.wav");
         instance->setStage(PLAY_STAGE);
     }
-    
+    */
 }
 
 PlayStage::PlayStage() {
     world = new World();
 
+    Game* instance = Game::instance;
+    Vector2 size = Vector2(instance->window_width/6, instance->window_height/6);
+
+    Material material;
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+    material.color = Vector4::WHITE;
+
+    health_bar = new EntityUI(Vector2(0, 0), size, material, eUIButtonID::UI_BUTTON_UNIDENTIFIED);
+
     Audio::Play("data/atmospheric.wav", 1.0f, BASS_SAMPLE_LOOP);
 }
 
 void PlayStage::render(Camera* camera) {
-    if (world)
+    Camera* camera2d = Game::instance->camera2d;
+    if (world) {
         world->render(camera);
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        //health_bar->render(camera2d);
+    }
 }
 
 void PlayStage::update(double seconds_elapsed, Camera* camera) {
-    if (world)
+    if (world) {
         world->update(seconds_elapsed);
+        //health_bar->update(seconds_elapsed);
+    }
     Player* player = Player::getInstance();
 }

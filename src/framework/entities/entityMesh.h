@@ -22,7 +22,7 @@ public:
 	Material material;
 
 	//culling
-	bool culling = true;
+	bool culling = false;
 
 	int layer = eCollisionFilter::NONE;
 	//Instancing

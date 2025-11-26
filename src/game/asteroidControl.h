@@ -9,7 +9,7 @@ public:
     std::vector<Asteroid*> asteroids;
 
     float spawnTimer = 0.0f;
-    float spawnInterval = 1.2f; // cada 1.2s apareix un meteorit
+    float spawnInterval = 2.4f; // cada x seg apareix un meteorit
 
 
     eSpawnPattern currentPattern = PATTERN_MID;

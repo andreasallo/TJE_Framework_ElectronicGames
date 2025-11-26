@@ -41,29 +41,31 @@ void Player::render(Camera* camera)
     // Render mesh
     EntityMesh::render(camera);
 
-#ifdef RENDER_DEBUG
-    // Render sphere using a basic.vs + flat.fs shader
-    Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-    Mesh * mesh = Mesh::Get("data/meshes/sphere.obj");
+    if (Game::IsDebugMode())
+    {
 
-    shader->enable();
+        // Render sphere using a basic.vs + flat.fs shader
+        Shader* shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+        Mesh* mesh = Mesh::Get("data/meshes/sphere.obj");
 
-    Matrix44 m;
-    float pivot_offset = -0.29f;  // ajusta fins que quedi al centre
-    m.setTranslation(getGlobalMatrix().getTranslation() + Vector3(0, -pivot_offset, 0));
+        shader->enable();
 
-    //m.setTranslation(getGlobalMatrix().getTranslation());
-    m.scale(collision_radius, collision_radius, collision_radius);
-    
+        Matrix44 m;
+        float pivot_offset = -0.29f;  // ajusta fins que quedi al centre
+        m.setTranslation(getGlobalMatrix().getTranslation() + Vector3(0, -pivot_offset, 0));
 
-    shader->setUniform("u_color", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-    shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
-    shader->setUniform("u_model", m);
+        //m.setTranslation(getGlobalMatrix().getTranslation());
+        m.scale(collision_radius, collision_radius, collision_radius);
 
-    mesh->render(GL_LINES);
 
-    shader->disable();
-#endif RENDER_DEBUG
+        shader->setUniform("u_color", Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+        shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
+        shader->setUniform("u_model", m);
+
+        mesh->render(GL_LINES);
+
+        shader->disable();
+    }
 }
 
 
@@ -81,7 +83,7 @@ const Vector3& Player::getMovementDirection() {
     if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP)) move_dir -= front;
     if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN)) move_dir += front;
     if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT)) move_dir -= right;
-    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) move_dir += right;
+    if (Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) move_dir += right;
 
     return move_dir.normalize();
 }
@@ -182,27 +184,27 @@ void Player::update(float delta_time)
 
 void Player::update(float dt)
 {
-    // ---- INPUT ----
 
     float x = 0, y = 0;
     if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT))  x += 1.0f;
-    if (Input::isKeyPressed(SDL_SCANCODE_D) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) x -= 1.0f;
+    if (Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) x -= 1.0f;
     if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP))    y -= 1.0f;
-    if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN))  y += 1.0f;
+    if (Input::isKeyPressed(SDL_SCANCODE_F) || Input::isKeyPressed(SDL_SCANCODE_DOWN))  y += 1.0f;
 
     Vector3 move(x, y, 0);
-    if (move.length() > 0.001f)
-        move.normalize();
+    if (move.length() > 0.001f) {
+		move.normalize();
+    }
 
-    // ---- MOVIMENT LATERAL ----
+    //MOVIMENT LATERAL
     position.x += move.x * lateralSpeed * dt;
     position.y += move.y * lateralSpeed * dt;
 
-    // ---- LIMITS ----
+    //limitar pantalla
     position.x = clamp(position.x, minX, maxX);
     position.y = clamp(position.y, minY, maxY);
 
-    // ---- ROTACIÓ VISUAL ----
+    //ROTACIÓ VISUAL 
     float maxRoll = 20.0f * DEG2RAD;
     float maxPitch = 18.0f * DEG2RAD;
 
@@ -214,13 +216,13 @@ void Player::update(float dt)
     visualRoll = lerp(visualRoll, desiredRoll, k);
     visualPitch = lerp(visualPitch, desiredPitch, k);
 
-    // ---- MODEL ----
+    
     model.setIdentity();
     model.setTranslation(position);
     model.rotate(visualPitch, Vector3(1, 0, 0));
     model.rotate(visualRoll, Vector3(0, 0, 1));
 
-    //----turbo
+    //turbo
     if (turbo)
     {
         turbo_timer -= dt;
@@ -244,9 +246,9 @@ void Player::handleImpact(Asteroid* asteroid)
         lives--;
         std::cout << "¡IMPACTO! Vidas restantes: " << lives << std::endl;
 
-        //Destruir el meteorito con el que se ha chocado
+        //Destruir el meteorit
         World::getInstance()->destroyEntity(asteroid);
-        asteroid->toDelete = true; // Marca para que AsteroidControl lo limpie
+        asteroid->toDelete = true; //AsteroidControl CONTROLA TOTA LA NETEJA
 
        
 

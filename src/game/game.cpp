@@ -21,6 +21,7 @@ Shader* shader = NULL;
 
 Game* Game::instance = NULL;
 World* World::instance = NULL;
+bool Game::debug = false;
 
 MenuStage* menu_stage;
 PlayStage* play_stage;
@@ -38,6 +39,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	time = 0.0f;
 	elapsed_time = 0.0f;
 	mouse_locked = false;
+
 
 
 	// OpenGL flags
@@ -94,7 +96,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	Audio::Init();
 
-	audio = new Audio();
+	//audio = new Audio();
 	//audio->Play("sounds/coin.wav");
 
 
@@ -108,6 +110,16 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 //what to do when the image has to be draw
 void Game::render(void)
 {
+	//és necessari per a pintar un frame
+	// Set the clear color (the background color)
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	// Clear the window and the depth buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Set the camera as default
+	camera->enable();
+
 	current_stage->render(camera);
 
 
@@ -120,7 +132,12 @@ void Game::update(double seconds_elapsed)
 	current_stage->update(seconds_elapsed, camera);
 }
 
-void Game::setStage(int new_stage) {
+/* -------------- AIXÒ ÉS NOU --------------*/
+// he afegit onExit i onEnter a setStage per què ho faci cada vegada que canviem
+void Game::setStage(eStage new_stage, eStage last_stage) {
+	Stage::onExit(last_stage);
+	Stage::onEnter(new_stage);
+
 	if (new_stage == MAIN_MENU) {
 		current_stage = menu_stage;
 	}
@@ -139,6 +156,10 @@ void Game::onKeyDown(SDL_KeyboardEvent event)
 		must_exit = true; break; //ESC key, kill the app
 	case SDLK_F1:
 		Shader::ReloadAll(); break;
+
+	case SDLK_d:
+		debug = !debug;
+		break;
 	}
 }
 

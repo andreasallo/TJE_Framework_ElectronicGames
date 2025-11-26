@@ -15,11 +15,17 @@
 class Stage;
 class World;
 class Audio;
+/* -------------- AIXÒ ÉS NOU --------------*/
+// sinó no funciona la nova declaració de setStage
+enum eStage;
 
 class Game
 {
 public:
 	static Game* instance;
+
+	//debug
+	static bool debug;
 
 	//window
 	SDL_Window* window;
@@ -77,5 +83,8 @@ public:
 	//static Entity* getRoot() { return instance->root; };
 
 	//stage !!!
-	void setStage(int new_stage);
+	void setStage(eStage new_stage, eStage last_stage);
+
+	//debug
+	static bool IsDebugMode() { return debug; }
 };

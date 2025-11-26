@@ -23,21 +23,20 @@ void AsteroidControl::init()
 void AsteroidControl::update(float dt)
 {
 
-    // Sync pattern with rings (but keep a separate timer logic for modularity)
+    //sincronitzar amb els rings
     patternTimer += dt;
     if (patternTimer >= patternCycleTime)
     {
         patternTimer = 0.0f;
         currentPattern = (eSpawnPattern)((currentPattern + 1) % PATTERN_TOTAL);
-        // Debug: std::cout << "Asteroid pattern changed to: " << currentPattern << std::endl;
     }
 
     Player* player = World::instance->player;
     float worldSpeedFactor = player && player->turbo ? 2.0f : 1.0f;
 
-    // Spawn amb turbo una mica més ràpid
+	//Spawn // turbo afecta spawn rate
     spawnTimer += dt;
-    float currentSpawnInterval = player->turbo ? spawnInterval * 0.6f : spawnInterval;
+	float currentSpawnInterval = player->turbo ? spawnInterval * 0.6f : spawnInterval; // per el turbo, fem que apareguin més sovint, un 40% més ràpid
 
     spawnTimer += dt;
     if (spawnTimer >= currentSpawnInterval) {
@@ -52,13 +51,13 @@ void AsteroidControl::update(float dt)
         float originalSpeed = a->speed;
 
         if (player->turbo)
-            a->speed = originalSpeed * 2.0f;   // o 1.5 / 2.5 etc segons gust
+            a->speed = originalSpeed * 4.0f; 
         else
             a->speed = originalSpeed;
 
         a->update(dt);
 
-        // restaurar velocitat original (no la volem guardar modificada)
+        //restaurar velocitat original (no la volem guardar modificada)
         a->speed = originalSpeed;
     }
 
@@ -73,21 +72,21 @@ void AsteroidControl::update(float dt)
             bool hit = Collision::TestEntitySphere(a,player->collision_radius,player->getCollisionCenter(),results,eCollisionFilter::ENEMY);
 
             if (hit) {
-                // impacto!
+               
                 a->toDelete = true;
                 World::getInstance()->destroyEntity(a);
 
-                // resta vida i reacciona el player
+                //resta vida 
+				//AQUI PODREIEM AFEGIR UNES PARTICULES O EFECTE DE CRASH AL METORIT
                 player->lives = std::max(0, player->lives - 1);
 
                 Audio::Play("data/crash.wav", 1.0f, BASS_SAMPLE_MONO);
                 std::cout << "Player hit! lives: " << player->lives << std::endl;
 
-                //Play sound, spawn particle, camera shake...
             }
         }
     }
-    // Neteja vector d'asteroids (els marcats per eliminar)
+    //Neteja vector d'asteroids (els marcats per eliminar a asteroid)
     asteroids.erase(
         std::remove_if(
             asteroids.begin(),
@@ -104,13 +103,16 @@ void AsteroidControl::spawnAsteroid()
     Player* player = World::instance->player;
     Vector3 p = player->model.getTranslation();
 
-    // Spawn lluny, dins l'espai del túnel però fora de la zona del jugador.
-    float zSpawn = 120.0f; // davant del jugador (ajusta segons sistema)
+   
+    float zSpawn = 220.0f; 
     
+    const float tunnelMinY = -6.0f;
+    const float tunnelMaxY = 20.0f;
+    const float ringLowLimit = 0.0f;
+    const float ringMidLimit = 10.0f;
+    const float ringHighLimit = 16.0f;
 
-    // zona prohibida: utilitza els limits del player si són públics
-    float pMinX = -12.0f, pMaxX = 12.0f;
-    float pMinY = -6.0f, pMaxY = 20.0f;
+    
 
     float minY = -10.0f, maxY = 10.0f;
 
@@ -124,37 +126,40 @@ void AsteroidControl::spawnAsteroid()
     float x = random(-20.f, 7.f);     // dins del túnel
     //float y = random(-10.f, 10.f);       // centrat amb el player
     float y = 0.0f;
-    // Complementary vertical spawning based on pattern to encourage movement to the ring lane
+   
+
     switch (currentPattern) {
     case PATTERN_LOW:
         // Ring is LOW [-6, 4] -> Asteroid avoids it, targeting MID/HIGH [4, 10]
-        y = random(4.0f, maxY);
+        y = random(ringLowLimit, tunnelMaxY);
         break;
     case PATTERN_MID:
-        // Ring is MID [4, 14] -> Asteroid avoids it, targeting LOW [-10, 4]
-        y = random(minY, 4.0f);
+        if (random(0.0f, 1.0f) > 0.5f) // Randomly choose low or high complementary area
+            y = random(tunnelMinY, ringLowLimit); // Low area
+        else
+            y = random(ringMidLimit, tunnelMaxY); // High area
         break;
     case PATTERN_HIGH:
         // Ring is HIGH [14, 20] -> Asteroid avoids it, targeting MID/LOW [-10, 10]
-        // We use a broader range since asteroid max Y is 10.
+        
         if (random(0.0f, 1.0f) > 0.5f)
-            y = random(minY, 0.0f); // Low zone [-10, 0]
+            y = random(tunnelMinY, ringLowLimit); // Low zone 
         else
-            y = random(0.0f, maxY); // Mid zone [0, 10]
+            y = random(ringMidLimit, tunnelMaxY); // Mid zone 
         break;
     default:
-        y = random(minY, maxY);
+        y = random(tunnelMinY,tunnelMaxY);
         break;
     }
     
     float z = p.z + 80.0f;
-
+    //float z = player->model.getTranslation().z + zSpawn;
    
 
     a->model.setTranslation(x, y, z);
 
-    a->speed = random(2.0f, 6.0f);         // més lent
-	a->collision_radius = 2.0f; //RADI PERFECTE PER METEORITS ACTUALS
+    a->speed = random(2.0f, 6.0f);//més lent
+	a->collision_radius = 2.0f; //RADI PERFECTE PER METEORITS ACTUALS, SI CANVIEM EL MESH CALDRIA TOCAR AQUI
     a->layer = eCollisionFilter::ENEMY;
 
     World::instance->addEntity(a);

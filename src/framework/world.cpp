@@ -18,13 +18,6 @@
 
 #include <random>
 
-//aqui se carga un avion 
-//ir hacia la z, ir hacia delante
-//else{}
-//root->update(delta_time);
-//player->model.translate(0, 0, -41 * delta_time);
-
-
 
 World::World() {
 	instance = this;

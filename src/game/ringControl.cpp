@@ -27,7 +27,6 @@ void RingControl::update(float dt)
     {
         patternTimer = 0.0f;
         currentPattern = (eSpawnPattern)((currentPattern + 1) % PATTERN_TOTAL);
-        // Debug: std::cout << "Ring pattern changed to: " << currentPattern << std::endl;
     }
 
     spawnTimer += dt;
@@ -43,13 +42,14 @@ void RingControl::update(float dt)
 
         r->update(dt);
 
-        // --- DETECCIÓ DE COLLISIÓ PEL FORAT ---
+        //DETECCIÓ DE COLLISIÓ PEL FORAT
+		//NO PODEM UTILITZAR EL SISTEMA DE COLLISIONS PERQUE NO VOLEM Q DETECTI TOT L'ANELL, NOMES QUAN PASSA PER DINS DEL FORAT
         Vector3 pc = player->getCollisionCenter();
         Vector3 rc = r->model.getTranslation();
 
         float dist = pc.distance(rc);
 
-        // Si el jugador passa pel forat
+        //jugador passa pel forat
         if (dist < r->inner_radius - player->collision_radius)
         {
             std::cout << "HAS AGAFAT UN RING! +1 moneda" << std::endl;
@@ -81,16 +81,16 @@ void RingControl::spawnRing()
     float x = random(minX, maxX);
     //float y = random(minY, maxY);
     float y = 0.0f;
-    // Structured vertical spawning based on pattern
+	//ESTRUCTURA VETTICAL LLIGADA AMB ASTEROID CONTROL
     switch (currentPattern) {
     case PATTERN_LOW:
-        y = random(minY, 4.0f); // Lower range [-6.0, 4.0]
+        y = random(minY, 0.0f); // Lower range
         break;
     case PATTERN_MID:
-        y = random(4.0f, 14.0f); // Mid range [4.0, 14.0]
+        y = random(0.0f, 10.0f); // Mid range 
         break;
     case PATTERN_HIGH:
-        y = random(14.0f, maxY); // High range [14.0, 20.0]
+        y = random(10.0f, 16.0f); // High range 
         break;
     default:
         y = random(minY, maxY);

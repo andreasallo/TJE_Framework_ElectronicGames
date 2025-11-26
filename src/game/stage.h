@@ -4,8 +4,6 @@
 #include "framework/camera.h"
 #include "framework/world.h"
 #include "graphics/texture.h"
-
-
 #include "framework/entities/entityUI.h"
 
 
@@ -26,8 +24,10 @@ public:
 	virtual void render(Camera* camera) {} // o = 0, si vols que les altres classes stage facin render si o si
 	virtual void update(double seconds_elapsed, Camera* camera) {}
 
-	virtual void onEnter(Stage* last_stage) {}
-	virtual void onExit(Stage* next_stage) {}
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	// he canviat els mètodes a static per poder crider-los des de game.cpp
+	static void onEnter(eStage next_stage);
+	static void onExit(eStage last_stage);
 
 };
 

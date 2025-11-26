@@ -27,6 +27,10 @@ EntityUI::EntityUI(Vector2 new_pos, Vector2 new_size, const Material& material, 
 void EntityUI::render(Camera* camera) {
 	Matrix44 viewproj = camera->viewprojection_matrix;
 
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	// el que fallava era que no feia shader->enable i shader->disable oops
+	material.shader->enable();
+
 	material.shader->setUniform("u_model", model);
 	material.shader->setUniform("u_viewprojection", viewproj); //error
 	material.shader->setUniform("u_color", material.color);
@@ -46,6 +50,8 @@ void EntityUI::render(Camera* camera) {
 		mesh->render(GL_TRIANGLES);
 	}
 
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	material.shader->disable();
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -68,7 +74,9 @@ void EntityUI::update(double seconds_elapsed) {
 			switch (button_id)
 			{
 			case UI_BUTTON_PLAY:
-				Game::instance->setStage(PLAY_STAGE);
+				/* -------------- AIXÒ ÉS NOU --------------*/
+				// setStage passa a ser un mètode amb dues entrades
+				Game::instance->setStage(PLAY_STAGE, MAIN_MENU);
 				break;
 			case UI_BUTTON_EXIT:
 				break;
@@ -81,6 +89,8 @@ void EntityUI::update(double seconds_elapsed) {
 		}
 	}
 	else {
-		material.color = Vector4::WHITE;
+		/* -------------- AIXÒ ÉS NOU --------------*/
+		//Ho he canviat a verd per què la barra de vida em sortia blanca sempre si ho deixava blanc, cal afegir una opció per a la barra de vida a aquest métode en un futur, crec 
+		material.color = Vector4::GREEN;
 	}
 }

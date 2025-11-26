@@ -7,7 +7,7 @@ enum eSpawnPattern {
     PATTERN_LOW,
     PATTERN_MID,
     PATTERN_HIGH,
-    PATTERN_TOTAL // Used for modulo cycling
+    PATTERN_TOTAL 
 };
 
 class RingControl {

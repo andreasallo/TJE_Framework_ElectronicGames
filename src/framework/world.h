@@ -55,13 +55,23 @@ public:
 	float lastSpawnedChunkZ = -9999.0f;
 
 	//particles
+	//EXPLOSION
 	ParticleEmitter* explosion_emitter = nullptr;
 	void spawnExplosion(const Vector3& pos);
 	float explosion_timer = 0.0f;
 	std::vector<Entity*> transparent_entities;
+
+	//SMOKE
 	ParticleEmitter* smoke_emitter = nullptr;
 	float smoke_timer = 0.0f;
 	ParticleEmitter* engine_fire_emitter = nullptr;
+
+	//DAMAGE NAU
+	ParticleEmitter* damage_smoke_emitter = nullptr;
+	float damage_smoke_timer = 0.0f;
+	bool damage_active = false;
+	float chromatic_aberration_timer = 0.0f;
+
 
 
 

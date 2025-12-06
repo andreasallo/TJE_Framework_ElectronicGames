@@ -46,7 +46,7 @@ Player::Player(Mesh* mesh, const Material& material, const std::string& name)
     /* -------------- AIXÒ ÉS NOU --------------*/
     //Inicialització de les entityUI del menú de pausa
 
-    turbo_timer = turbo_duration;
+    turbo_timer = 0.0f;
 
     Game* instance = Game::instance;
 
@@ -73,6 +73,7 @@ Player::Player(Mesh* mesh, const Material& material, const std::string& name)
     material_b.color = Vector4(0.25);
 
     turbo_bar = new EntityUI(position_a, size, material_b, eUIButtonID::UI_TURBO);
+    turbo_bar->mask = 0.0f;
 }
 
 
@@ -164,7 +165,7 @@ void Player::update(float dt)
     if (Input::isKeyPressed(SDL_SCANCODE_F) || Input::isKeyPressed(SDL_SCANCODE_DOWN))  y += 1.0f;
     /* -------------- AIXÒ ÉS NOU --------------*/
     //mentre presiones Z, tens el turbo activat
-    if (Input::isKeyPressed(SDL_SCANCODE_Z)) turbo = true;
+    //if (Input::isKeyPressed(SDL_SCANCODE_Z)) turbo = true;
     //if (Input::isKeyPressed(SDL_SCANCODE_P)) instance->isPaused = true;
 
     Vector3 move(x, y, 0);
@@ -202,11 +203,10 @@ void Player::update(float dt)
     model.rotate(visualRoll, Vector3(0, 0, 1));
 
     //turbo
-    /**/
+    /*
     if (turbo)
     {
         turbo_timer -= dt;
-        /*----------------Això és nou----------------*/
         //actualitza la mask de la barra de turbo mentre està activat el turbo
         turbo_bar->mask -= dt / turbo_duration;
 
@@ -215,6 +215,28 @@ void Player::update(float dt)
             turbo = false;
             std::cout << "Turbo OFF" << std::endl;
         }
+    }*/
+
+    //turbo
+    bool trying_to_turbo = Input::isKeyPressed(SDL_SCANCODE_Z);
+
+    if (trying_to_turbo && turbo_timer > 0.0f) {
+        turbo = true;
+        turbo_timer -= dt;
+    }
+    else {
+        // Si no prems la tecla O se t'ha acabat el temps -> Turbo OFF
+        turbo = false;
+    }
+
+    //protecció: que el timer no baixi de 0
+    if (turbo_timer < 0.0f) {
+        turbo_timer = 0.0f;
+        turbo = false; 
+    }
+
+    if (turbo_bar) {
+        turbo_bar->mask = turbo_timer / turbo_duration;
     }
 
     if (Input::wasKeyPressed(SDL_SCANCODE_SPACE))
@@ -268,7 +290,6 @@ void Player::handleImpact(Asteroid* asteroid)
         //Destruir el meteorit
         World::getInstance()->destroyEntity(asteroid);
         asteroid->toDelete = true; //AsteroidControl CONTROLA TOTA LA NETEJA
-
        
 
         if (lives <= 0) //DEAD

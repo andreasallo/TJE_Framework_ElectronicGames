@@ -152,6 +152,25 @@ World::World() {
 		transparent_entities.push_back(engine_fire_emitter);
 		root->addChild(engine_fire_emitter);
 
+		// --- DAMAGE SMOKE (fum quan reps impacte) ---
+		damage_smoke_emitter = new ParticleEmitter();
+		damage_smoke_emitter->setTexture("data/particles/smoke_atlas.png");
+		damage_smoke_emitter->setTextureGridSize(2);
+		damage_smoke_emitter->setAdditiveBlendingEnabled(false); // fum normal
+		damage_smoke_emitter->setEmissionEnabled(false); // només en impacte
+		damage_smoke_emitter->setEmitRate(0.03f);
+		damage_smoke_emitter->setMaxTimeAlive(2.5f);
+		damage_smoke_emitter->setRandomFactor(0.4f);
+		damage_smoke_emitter->setSizesCurve({ 0.4f, 1.4f, 2.0f });
+		damage_smoke_emitter->setColorsCurve({
+			Vector4(0.3f, 0.3f, 0.3f, 0.7f),
+			Vector4(0.2f, 0.2f, 0.2f, 0.4f),
+			Vector4(0.1f, 0.1f, 0.1f, 0.0f)
+			});
+
+		// important: render transparent
+		transparent_entities.push_back(damage_smoke_emitter);
+		root->addChild(damage_smoke_emitter);
 
 	}
 }
@@ -221,6 +240,7 @@ void World::spawnExplosion(const Vector3& pos)
 	//smoke_emitter->clearParticles();
 	smoke_emitter->setEmissionEnabled(true);
 	smoke_timer = 0.5f;
+
 }
 
 
@@ -458,6 +478,13 @@ void World::update(float delta_time)
 			smoke_emitter->setEmissionEnabled(false);
 	}
 
+	if (chromatic_aberration_timer > 0.0f)
+	{
+		chromatic_aberration_timer -= delta_time;
+
+		if (chromatic_aberration_timer < 0.0f)
+			chromatic_aberration_timer = 0.0f;
+	}
 
 
 
@@ -507,6 +534,8 @@ void World::updateCamera(float dt)
 	smoothedEye = lerp(smoothedEye, new_eye, k);
 	smoothedCenter = lerp(smoothedCenter, new_center, k);
 	
+
+
 	camera->lookAt(smoothedEye, smoothedCenter, rotatedUp);
 }
 

@@ -6,6 +6,7 @@
 #include "framework/world.h"
 #include "graphics/texture.h"
 #include "framework/entities/entityUI.h"
+#include "graphics/fbo.h"
 
 
 class Game;
@@ -25,6 +26,10 @@ enum eStage {
 
 class Stage {
 public:
+
+	//PREPARATIUS PER FER EFECTES AMB SHADERS
+	FBO* fbo = nullptr;
+	Mesh* screen_quad = nullptr;
 
 	//Game* instance = Game::instance;
 
@@ -49,6 +54,8 @@ public:
 	Image background;
 	Texture* background_tex = nullptr;
 
+	
+
 	/* -------------- AIXÒ ÉS NOU --------------*/
 	//la referència de e les entities que inicialitzem al constructor
 	EntityUI* start_button = nullptr;
@@ -72,6 +79,8 @@ public:
 	Vector3 camera_current_center;
 	bool first_frame = true;
 	*/
+
+	float vignette_intensity = 0.0f;
 
 	/*----------------Això és nou----------------*/
 	//les flags del menu de pausa

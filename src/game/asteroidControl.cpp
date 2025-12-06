@@ -52,6 +52,7 @@ void AsteroidControl::update(float dt)
                 a->toDelete = true;
                 World::getInstance()->destroyEntity(a);
 
+
                 //resta vida 
 				//AQUI PODREIEM AFEGIR UNES PARTICULES O EFECTE DE CRASH AL METORIT
                 player->lives = std::max(0, player->lives - 1);
@@ -59,6 +60,9 @@ void AsteroidControl::update(float dt)
                 /*----------------Això és nou----------------*/
                 //actualitza la mask de la barra de vida quan la nau rep un cop
                 player->health_bar->mask = (float)(player->lives / player->max_lives);
+
+              
+                World::instance->chromatic_aberration_timer = 1.0f;
 
                 Audio::Play("data/crash.wav", 1.0f, BASS_SAMPLE_MONO);
                 std::cout << "Player hit! lives: " << player->lives << std::endl;

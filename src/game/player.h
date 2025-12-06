@@ -71,6 +71,7 @@ public:
 	int coins_collected = 0;
 	float turbo_duration = 3.0f; // Duración del turbo en segundos
 
+
 	/* -------------- AIXÒ ÉS NOU --------------*/
 	//Entities de la HUD del play stage, les que s'actualitzen
 	EntityUI* turbo_bar = nullptr;

@@ -10,6 +10,8 @@
 #include "framework/world.h"
 #include "framework/camera.h"
 #include "graphics/texture.h"
+#include "graphics/shader.h"
+#include "graphics/fbo.h"
 
 enum MenuOptions {
     MENU_START,
@@ -264,6 +266,13 @@ PlayStage::PlayStage() {
     position = Vector2(instance->window_width / 2, instance->window_height - 80);
 
     exit_button = new EntityUI(position, size, material, eUIButtonID::UI_BUTTON_EXIT);
+
+    // Inicialitzar FBO i Quad PER EFECTES D SHADER
+    fbo = new FBO();
+    fbo->create(instance->window_width, instance->window_height);
+
+    screen_quad = new Mesh();
+    screen_quad->createQuad(0, 0, 2, 2, false);
 }
 
 void PlayStage::render(Camera* camera) {
@@ -276,6 +285,39 @@ void PlayStage::render(Camera* camera) {
     if (world) {
         world->render(camera);
 
+		//render to texture for postprocess effects
+        fbo->bind(); // Activem el "mode gravar a textura"
+        world->render(camera); // Renderitzem el 3D normal
+        fbo->unbind();
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        Shader* shader = Shader::Get("data/shaders/screen.vs", "data/shaders/chromatic.fs");
+        shader->enable();
+        shader->setTexture("u_texture", fbo->color_textures[0], 0);
+        float intensity = 0.0f;
+        if (world->chromatic_aberration_timer > 0.0f) {
+            intensity = world->chromatic_aberration_timer;
+        }
+        shader->setUniform("u_amount", intensity);
+        screen_quad->render(GL_TRIANGLES);
+        shader->disable();
+
+        if (vignette_intensity > 0.01f) // Optimització: només si es veu
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_DEPTH_TEST);
+            Shader* v_shader = Shader::Get("data/shaders/screen.vs", "data/shaders/vignetting.fs");
+            v_shader->enable();
+            v_shader->setUniform("u_intensity", vignette_intensity);
+            screen_quad->render(GL_TRIANGLES);
+
+            v_shader->disable();
+        }
+
+
+        glEnable(GL_BLEND);
 
         /* -------------- AIXÒ ÉS NOU --------------*/
         //render de cada EntityUI que hem creat al constructor
@@ -302,6 +344,8 @@ void PlayStage::render(Camera* camera) {
         /*
         std::string t = std::to_string(instance->elapsed_time);
         drawText(instance->window_width / 2, instance->window_height / 2, t, Vector3(1.0), 10);*/
+
+        glEnable(GL_DEPTH_TEST);
     }
 }
 
@@ -310,6 +354,14 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
     //instancies de game i player
     Game* instance = Game::instance;
     Player* player = Player::getInstance();
+
+    //VINYETATGE TURBO 
+    float target_vignette = 0.0f;
+    if (player->turbo) {
+        target_vignette = 1.2f;
+    }
+    float speed = 3.0f * (float)seconds_elapsed;
+    vignette_intensity = lerp(vignette_intensity, target_vignette, speed);
 
     /*----------------Això és nou----------------*/
     //si cliques P, s'activa la bandera del menú de pausa

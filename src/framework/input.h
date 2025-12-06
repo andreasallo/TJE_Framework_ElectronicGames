@@ -97,11 +97,15 @@ public:
 	//mouse
 	static bool isMousePressed(int button) { return mouse_state & SDL_BUTTON(button); } //button could be SDL_BUTTON_LEFT
 	static bool wasMousePressed(int button) { return (mouse_state & SDL_BUTTON(button)) && !(prev_mouse_state & SDL_BUTTON(button)); } //button could be SDL_BUTTON_LEFT
-	static bool wasMouseReleased(int button) { return (mouse_state & SDL_BUTTON(button)) && !(prev_mouse_state & SDL_BUTTON(button)); } //button could be SDL_BUTTON_LEFT // IMPLEMENTAR
+	
+	
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	static bool wasMouseReleased(int button) { return !(mouse_state & SDL_BUTTON(button)) && (prev_mouse_state & SDL_BUTTON(button)); } //button could be SDL_BUTTON_LEFT // IMPLEMENTAR
 
-	static void init( SDL_Window* window );
+	static void init(SDL_Window* window);
 	static void update();
 
 	static SDL_Joystick* openGamepad(int index);
 	static void updateGamepadState(SDL_Joystick* joystick, GamepadState& state);
 };
+

@@ -1,6 +1,7 @@
+
 #include "framework/entities/entityUI.h"
 
-EntityUI::EntityUI(Vector2 new_size, const Material& material) {
+EntityUI::EntityUI(Vector2 new_size, const Material & material) {
 	size = new_size;
 
 	this->material = material;
@@ -27,17 +28,25 @@ EntityUI::EntityUI(Vector2 new_pos, Vector2 new_size, const Material& material, 
 void EntityUI::render(Camera* camera) {
 	Matrix44 viewproj = camera->viewprojection_matrix;
 
-	/* -------------- AIXÒ ÉS NOU --------------*/
-	// el que fallava era que no feia shader->enable i shader->disable oops
+	/*----------------Això és nou----------------*/
+	//Això ho tenia posat al Stage render, ara aquí dins
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthMask(GL_FALSE);
+
 	material.shader->enable();
 
 	material.shader->setUniform("u_model", model);
-	material.shader->setUniform("u_viewprojection", viewproj); //error
+	material.shader->setUniform("u_viewprojection", viewproj);
 	material.shader->setUniform("u_color", material.color);
 	material.shader->setUniform("u_mask", mask);
 
 	if (material.diffuse) {
-		material.shader->setUniform("u_texture", material.diffuse, 0);
+		/*----------------Això és nou----------------*/
+		//SetTexture enlloc de setUniform
+		material.shader->setTexture("u_texture", material.diffuse, 0);
 	}
 
 	if (is3D) {
@@ -50,19 +59,28 @@ void EntityUI::render(Camera* camera) {
 		mesh->render(GL_TRIANGLES);
 	}
 
-	/* -------------- AIXÒ ÉS NOU --------------*/
 	material.shader->disable();
 
+	/*----------------Això és nou----------------*/
+	//Això ho tenia posat al Stage render, ara aquí dins, s'ha de desactivar
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDepthMask(GL_TRUE);
 
 	Entity::render(camera);
 }
 
 void EntityUI::update(double seconds_elapsed) {
 	Vector2 mouse_pos = Input::mouse_position;
+	/*----------------Això és nou----------------*/
+	//instancies de game i player
+	Game* instance = Game::instance;
+	Player* player = Player::instance;
 
-	if (button_id != UI_BUTTON_UNIDENTIFIED &&
+	/*----------------Això és nou----------------*/
+	//he  posat que només entri si el tipus de EntityUI és un tipus 'button'
+	if ((button_id == UI_BUTTON_PLAY || button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_RESUME) &&
 		mouse_pos.x > (position.x - size.x * 0.5f) &&
 		mouse_pos.x < (position.x + size.x * 0.5f) &&
 		mouse_pos.y >(position.y - size.y * 0.5f) &&
@@ -74,23 +92,40 @@ void EntityUI::update(double seconds_elapsed) {
 			switch (button_id)
 			{
 			case UI_BUTTON_PLAY:
-				/* -------------- AIXÒ ÉS NOU --------------*/
-				// setStage passa a ser un mètode amb dues entrades
-				Game::instance->setStage(PLAY_STAGE, MAIN_MENU);
+				/*----------------Això és nou----------------*/
+				//que vagi del menu al stage nou de Lore i Tutorial
+				instance->setStage(TUTORIAL_STAGE, MAIN_MENU);
+				break;
+				/*----------------Això és nou----------------*/
+				//el case del nou botó de la pantalla de pausa
+			case UI_BUTTON_RESUME:
+				instance->isPaused = false;
 				break;
 			case UI_BUTTON_EXIT:
+				/*----------------Això és nou----------------*/
+				//fa que si cliques el botó de exit, tanca el programa
+				instance->must_exit = true;
 				break;
-			defalut:
+				/*----------------Això és nou----------------*/
+				//default estava malament escrit
+			default:
 				break;
 			}
 		}
 		else if (Input::isMousePressed(SDL_BUTTON_LEFT)) {
-			material.color = Vector4(0.9f, 0.9f, 0.9f, 1.0f);
+			/*----------------Això és nou----------------*/
+			//h canviat llegerament el color
+			material.color = Vector4(0.8f, 0.8f, 0.8f, 1.0f);
 		}
 	}
-	else {
-		/* -------------- AIXÒ ÉS NOU --------------*/
-		//Ho he canviat a verd per què la barra de vida em sortia blanca sempre si ho deixava blanc, cal afegir una opció per a la barra de vida a aquest métode en un futur, crec 
-		material.color = Vector4::GREEN;
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	//però no fa res lol
+	else if (button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_PLAY) {
+		material.color = Vector4::WHITE;
+	}
+	else if (button_id == UI_HEALTHBAR) {
+	}
+	else if (button_id == UI_TURBO) {
 	}
 }
+

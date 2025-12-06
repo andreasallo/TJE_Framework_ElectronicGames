@@ -79,12 +79,13 @@ void EntityMesh::render(Camera* camera) {
 
     }
 
+    /*
     // Set OpenGL flags
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
+	*/
 
     //Enable shader and pass uniforms --- SHADER PART
     shader->enable();
@@ -97,12 +98,12 @@ void EntityMesh::render(Camera* camera) {
     if (material.diffuse) { //si mi malla tiene MTL ---- TEXTURE 
         shader->setTexture("u_texture", material.diffuse, 0); //difusse es textura
     }
-    else {
+    /*else {
         // Desenlazar si no hay textura para evitar usar una textura anterior
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
         shader->setUniform("u_texture", 0);
-    }
+    }*/
 
     if (isInstanced) { //----------RENDER INSTANCED MESHES
         //renderizar totes les instancies visibles

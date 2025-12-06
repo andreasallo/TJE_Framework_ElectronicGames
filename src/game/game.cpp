@@ -25,6 +25,8 @@ bool Game::debug = false;
 
 MenuStage* menu_stage;
 PlayStage* play_stage;
+TutorialStage* tutorial_stage;
+EndStage* end_stage;
 
 Game::Game(int window_width, int window_height, SDL_Window* window)
 {
@@ -63,6 +65,9 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 
 	menu_stage = new MenuStage();
 	play_stage = new PlayStage();
+	//constructor dels nous stage
+	tutorial_stage = new TutorialStage();
+	end_stage = new EndStage();
 
 	/*//CREATE HEIGHTMAP
 	{
@@ -90,7 +95,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	}*/
 
 	current_stage = menu_stage;
-	
+
 	/*
 	*/
 
@@ -143,6 +148,12 @@ void Game::setStage(eStage new_stage, eStage last_stage) {
 	}
 	else if (new_stage == PLAY_STAGE) {
 		current_stage = play_stage;
+	}
+	else if (new_stage == TUTORIAL_STAGE) {
+		current_stage = tutorial_stage;
+	}
+	else if (new_stage == END_STAGE) {
+		current_stage = end_stage;
 	}
 }
 

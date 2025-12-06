@@ -14,6 +14,7 @@ enum eCollisionFilter {
 	WALL = 1 << 1,
 	PLAYER = 1 << 2,
 	ENEMY = 1 << 3,
+	PROJECTILE = 1 << 4,
 	SCENARIO = FLOOR | WALL,
 	ALL = 0xFF
 };

@@ -38,6 +38,7 @@ void Ring::update(float dt)
 {
     // Aceleración de los aros durante el turbo del jugador
     float current_speed = speed;
+
     if (World::instance && World::instance->player && World::instance->player->turbo) {
         current_speed *= 4.0f; // Multiplicador de velocidad (sincronizado con meteoritos)
     }

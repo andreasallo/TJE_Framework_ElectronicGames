@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "game/game.h"
@@ -10,10 +11,16 @@
 class Game;
 class World;
 class EntityUI;
+/* -------------- AIXÒ ÉS NOU --------------*/
+class Player;
 
 enum eStage {
 	MAIN_MENU,
 	PLAY_STAGE,
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	//pel nou stage
+	TUTORIAL_STAGE,
+	END_STAGE,
 };
 
 class Stage {
@@ -42,9 +49,16 @@ public:
 	Image background;
 	Texture* background_tex = nullptr;
 
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	//la referència de e les entities que inicialitzem al constructor
+	EntityUI* start_button = nullptr;
+	EntityUI* exit_button = nullptr;
+
 	MenuStage();
 
-	void render(Camera* camera);
+	/*----------------Això és nou----------------*/
+	//menu stage render
+	void render(Camera* camera2d);
 	void update(double seconds_elapsed, Camera* camera);
 
 };
@@ -59,11 +73,55 @@ public:
 	bool first_frame = true;
 	*/
 
+	/*----------------Això és nou----------------*/
+	//les flags del menu de pausa
+	bool pWasPressed = false;
+	bool pIsPressed = false;
+
 	class World* world = nullptr;
 
-	EntityUI* health_bar = nullptr;
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	//la referència de les entities que inicialitzem al constructor
+	//EntityUI* health_bar = nullptr;
+	//EntityUI* turbo_bar = nullptr;
+
+	/*----------------Això és nou----------------*/
+	//entities UI
+	EntityUI* healthbar_background = nullptr;
+	EntityUI* level_indicator_bg = nullptr;
+	EntityUI* turbo_indicator_bg = nullptr;
+	EntityUI* turbo_bg = nullptr;
+	EntityUI* turbo_indicator = nullptr;
+	EntityUI* level_indicator = nullptr;
+
+	/*----------------Això és nou----------------*/
+	//Pause Menu Entities
+	EntityUI* resume_button = nullptr;
+	EntityUI* exit_button = nullptr;
 
 	PlayStage();
+
+	void render(Camera* camera);
+	void update(double seconds_elapsed, Camera* camera);
+};
+
+/* -------------- AIXÒ ÉS NOU --------------*/
+//TutorialStage i EndStage
+class TutorialStage : public Stage {
+public:
+	eStage type = TUTORIAL_STAGE;
+
+	TutorialStage();
+
+	void render(Camera* camera);
+	void update(double seconds_elapsed, Camera* camera);
+};
+
+class EndStage : public Stage {
+public:
+	eStage type = END_STAGE;
+
+	EndStage();
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed, Camera* camera);

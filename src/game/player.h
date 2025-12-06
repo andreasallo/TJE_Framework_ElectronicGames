@@ -13,6 +13,8 @@ class Mesh;
 class Material;
 class Camera;
 
+class EntityUI;
+
 class Player : public EntityCollider {
 private:
 
@@ -25,6 +27,7 @@ private:
 	float targetSpeed = 0.0f;    // Velocidad a la que queremos llegar
 	float acceleration = 40.0f;  // Qué tan rápido acelera
 	float rotation_speed = 1.5f; // Velocidad de giro
+	float forwardSpeed = 0.0f;  // velocitat constant cap endavant
 
 	
 	float visualPitch = 0.0f;
@@ -53,7 +56,10 @@ public:
 	float lateralSpeed = 8.0f;
 
 	int lives = 3;
-	float collision_radius = 0.6f;
+
+	//max_lives
+	float max_lives = 3.0f;
+	float collision_radius;
 
 	// Límits del túnel
 	float minX = -12.0f, maxX = 12.0f;
@@ -65,6 +71,12 @@ public:
 	int coins_collected = 0;
 	float turbo_duration = 3.0f; // Duración del turbo en segundos
 
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	//Entities de la HUD del play stage, les que s'actualitzen
+	EntityUI* turbo_bar = nullptr;
+	EntityUI* health_bar = nullptr;
+
+	bool canShoot() const;
 	void SetRenderMesh(bool new_render_mesh) { render_mesh = new_render_mesh; }
 	bool canMove(const Vector3& new_position);
 	void collison(Vector3& position);

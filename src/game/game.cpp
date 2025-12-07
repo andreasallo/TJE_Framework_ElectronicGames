@@ -95,6 +95,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	}*/
 
 	current_stage = menu_stage;
+	Stage::onEnter(eStage::MAIN_MENU);
 
 	/*
 	*/

@@ -29,17 +29,32 @@ void Stage::onEnter(eStage next_stage) {
         //Audio::Play("data/atmospheric.wav", 1.0f, BASS_SAMPLE_LOOP);
         break;
     case MAIN_MENU:
+        //Audio::Play("data/mus_theme_rep.mp3", 1.0f, BASS_SAMPLE_LOOP);
+        break;
+    case TUTORIAL_STAGE:
+        break;
+    case END_STAGE:
         break;
     }
 }
 
 
 void Stage::onExit(eStage last_stage) {
-
+    switch (last_stage) {
+    case PLAY_STAGE:
+        break;
+    case MAIN_MENU:
+        break;
+    case TUTORIAL_STAGE:
+        break;
+    case END_STAGE:
+        break;
+    }
 }
 
 
 MenuStage::MenuStage() {
+    /*
     background.loadTGA("data/2.tga");
 
     background.flipY();
@@ -47,6 +62,8 @@ MenuStage::MenuStage() {
     if (background.data) {
         background_tex = new Texture(&background);
     }
+    */
+
     /* -------------- AIXÒ ÉS NOU --------------*/
     //He afegit tot això inicialitza els botons del menú d'inici
     Game* instance = Game::instance;
@@ -61,9 +78,62 @@ MenuStage::MenuStage() {
 
     start_button = new EntityUI(position_a, size, material, eUIButtonID::UI_BUTTON_PLAY);
     exit_button = new EntityUI(position_b, size, material, eUIButtonID::UI_BUTTON_EXIT);
+
+    //TITLE
+    Vector2 position = Vector2(instance->window_width / 2, 50);
+    size = Vector2(472, 66);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Galactic.png");
+
+    title1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 150);
+    size = Vector2(613, 68);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Conqueror.png");
+
+    title2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 250);
+    size = Vector2(543, 92);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/SolNovus.png");
+
+    title3 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //BACKGROUND
+    Texture* cube_texture = new Texture();
+    cube_texture->loadCubemap("ProbaCubeMap", {
+        "data/space_cube_new/px.png",
+        "data/space_cube_new/nx.png",
+        "data/space_cube_new/ny.png",
+        "data/space_cube_new/py.png",
+        "data/space_cube_new/pz.png",
+        "data/space_cube_new/nz.png"
+        });
+
+    Material cubemap_material;
+    cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
+    cubemap_material.diffuse = cube_texture;
+
+    skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
 }
 
 void MenuStage::render(Camera* camera) {
+
+    //camera->enable();
+    /*nou*/
+    if (skybox) {
+        skybox->model.setTranslation(camera->eye);
+
+        glDisable(GL_DEPTH_TEST);
+        skybox->render(camera);
+        glEnable(GL_DEPTH_TEST);
+    }
+
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
@@ -79,6 +149,12 @@ void MenuStage::render(Camera* camera) {
         //toViewport dibuixa la textura a tota la pantalla
         background_tex->toViewport();
     }
+
+    /*nou*/
+    title1->render(camera2d);
+    title2->render(camera2d);
+    title3->render(camera2d);
+
     /* -------------- AIXÒ ÉS NOU --------------*/
     //utilitza la camara 2d per a renderitzar cada un dels botons
     start_button->render(camera2d);
@@ -156,6 +232,64 @@ void MenuStage::update(double seconds_elapsed, Camera* camera) {
     //update del start button i exit button
     start_button->update(seconds_elapsed);
     exit_button->update(seconds_elapsed);
+}
+
+/*----------------Això és nou----------------*/
+//metodes dels stages que ens falten, el de lore i el tutorial i el del final del nivell.
+TutorialStage::TutorialStage() {
+    //BACKGROUND
+    Texture* cube_texture = new Texture();
+    cube_texture->loadCubemap("ProbaCubeMap", {
+        "data/space_cube_new/px.png",
+        "data/space_cube_new/nx.png",
+        "data/space_cube_new/ny.png",
+        "data/space_cube_new/py.png",
+        "data/space_cube_new/pz.png",
+        "data/space_cube_new/nz.png"
+        });
+
+    Material cubemap_material;
+    cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
+    cubemap_material.diffuse = cube_texture;
+
+    skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
+
+    Game* instance = Game::instance;
+
+    Vector2 position = Vector2(instance->window_width / 2, instance->window_height / 2);
+    Vector2 size = Vector2(175, 100);
+
+    Material material;
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/spacebar.png");
+
+    spacebar = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+}
+
+void TutorialStage::render(Camera* camera) {
+    Game* instance = Game::instance;
+    Camera* camera2d = instance->camera2d;
+
+    if (skybox) {
+        skybox->model.setTranslation(camera->eye);
+
+        glDisable(GL_DEPTH_TEST);
+        skybox->render(camera);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    spacebar->render(camera2d);
+
+}
+
+void TutorialStage::update(double seconds_elapsed, Camera* camera) {
+    Game* instance = Game::instance;
+    /**/
+    if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
+        instance->audio->Play("sounds/coin.wav");
+        instance->setStage(PLAY_STAGE, TUTORIAL_STAGE);
+    }
+
 }
 
 PlayStage::PlayStage() {
@@ -252,7 +386,7 @@ PlayStage::PlayStage() {
 
     turbo_indicator_bg = new EntityUI(position, size, material_a, eUIButtonID::UI_BACKGROUND);
 
-    // Botó Resume i 
+    // Botó Resume i Exit
     position = Vector2(instance->window_width / 2, instance->window_height - 150);
     size = Vector2(150, 40);
 
@@ -266,6 +400,26 @@ PlayStage::PlayStage() {
     position = Vector2(instance->window_width / 2, instance->window_height - 80);
 
     exit_button = new EntityUI(position, size, material, eUIButtonID::UI_BUTTON_EXIT);
+
+    /*nou*/
+    //Shader fosc per a la pausa
+    position = Vector2(instance->window_width / 2, instance->window_height / 2);
+    size = Vector2(instance->window_width, instance->window_height);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+    material.color = Vector4(0.0, 0.0, 0.0, 0.5);
+
+    pause_shader = new EntityUI(position, size, material, eUIButtonID::UI_BACKGROUND);
+
+    //Pause Text
+    position = Vector2(instance->window_width / 2, 150);
+    size = Vector2(321, 66);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Pause.png");
+    material.color = Vector4(1.0);
+
+    pause_text = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
 
     // Inicialitzar FBO i Quad PER EFECTES D SHADER
     fbo = new FBO();
@@ -335,6 +489,8 @@ void PlayStage::render(Camera* camera) {
         //is està pausat el joc, renderitza els botons del menú de pausa
         if (instance->isPaused) {
             //renderitzes el menú de pause
+            pause_shader->render(camera2d);
+            pause_text->render(camera2d);
             resume_button->render(camera2d);
             exit_button->render(camera2d);
         }
@@ -396,27 +552,6 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
     /*----------------Això és nou----------------*/
     //sense això, no funciona laopció de pausa
     pWasPressed = Input::isKeyPressed(SDL_SCANCODE_P);
-}
-
-
-/*----------------Això és nou----------------*/
-//metodes dels stages que ens falten, el de lore i el tutorial i el del final del nivell.
-TutorialStage::TutorialStage() {
-
-}
-
-void TutorialStage::render(Camera* camera) {
-
-}
-
-void TutorialStage::update(double seconds_elapsed, Camera* camera) {
-    Game* instance = Game::instance;
-    /**/
-    if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
-        instance->audio->Play("sounds/coin.wav");
-        instance->setStage(PLAY_STAGE, TUTORIAL_STAGE);
-    }
-
 }
 
 EndStage::EndStage() {

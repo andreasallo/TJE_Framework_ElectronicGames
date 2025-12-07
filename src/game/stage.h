@@ -60,6 +60,13 @@ public:
 	//la referència de e les entities que inicialitzem al constructor
 	EntityUI* start_button = nullptr;
 	EntityUI* exit_button = nullptr;
+	
+	//títol
+	EntityUI* title1 = nullptr;
+	EntityUI* title3 = nullptr;
+	EntityUI* title2 = nullptr;
+
+	EntityMesh* skybox;
 
 	MenuStage();
 
@@ -108,6 +115,10 @@ public:
 	EntityUI* resume_button = nullptr;
 	EntityUI* exit_button = nullptr;
 
+	EntityUI* pause_text = nullptr;
+	EntityUI* pause_shader = nullptr;
+
+
 	PlayStage();
 
 	void render(Camera* camera);
@@ -119,6 +130,14 @@ public:
 class TutorialStage : public Stage {
 public:
 	eStage type = TUTORIAL_STAGE;
+
+	EntityMesh* skybox;
+
+	EntityUI* spacebar = nullptr;
+	EntityUI* a = nullptr;
+	EntityUI* b = nullptr;
+	EntityUI* c = nullptr;
+	EntityUI* d = nullptr;
 
 	TutorialStage();
 

@@ -55,11 +55,17 @@ public:
 
 	float lateralSpeed = 8.0f;
 
+	bool isDestroyed = false;
+
 	int lives = 3;
+	int previous_lives = 3;
 
 	//max_lives
 	float max_lives = 3.0f;
 	float collision_radius;
+
+	//regeneration countdown
+	float time_to_heal = 3.0f;
 
 	// Límits del túnel
 	float minX = -12.0f, maxX = 12.0f;

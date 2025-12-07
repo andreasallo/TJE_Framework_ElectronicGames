@@ -55,7 +55,13 @@ void AsteroidControl::update(float dt)
 
                 //resta vida 
 				//AQUI PODREIEM AFEGIR UNES PARTICULES O EFECTE DE CRASH AL METORIT
-                player->lives = std::max(0, player->lives - 1);
+                player->previous_lives = player->lives;
+                player->lives -= 1; //std::max(0, player->lives - 1);
+
+                if (player->lives <= -1) {
+                    std::cout << "GAME OVER - ";
+                    player->isDestroyed = true;
+                }
 
                 /*----------------Això és nou----------------*/
                 //actualitza la mask de la barra de vida quan la nau rep un cop

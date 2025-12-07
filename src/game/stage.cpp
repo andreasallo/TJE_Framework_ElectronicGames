@@ -67,42 +67,56 @@ MenuStage::MenuStage() {
     /* -------------- AIXÒ ÉS NOU --------------*/
     //He afegit tot això inicialitza els botons del menú d'inici
     Game* instance = Game::instance;
+
     Vector2 position_a = Vector2(instance->window_width / 2, instance->window_height - 150);
-    Vector2 position_b = Vector2(instance->window_width / 2, instance->window_height - 80);
+    Vector2 position_b = Vector2(instance->window_width / 2, instance->window_height - 100);
     Vector2 size = Vector2(150, 40);
 
-    Material material;
-    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-    //material.color = Vector4::WHITE;
+    Material material_a;
+    material_a.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
+    material_a.color = Vector4::BLUE;
     //material.diffuse = Texture::Get("data/textures/play.png");
 
-    start_button = new EntityUI(position_a, size, material, eUIButtonID::UI_BUTTON_PLAY);
-    exit_button = new EntityUI(position_b, size, material, eUIButtonID::UI_BUTTON_EXIT);
+    start_button = new EntityUI(position_a, size, material_a, eUIButtonID::UI_BUTTON_PLAY);
+    exit_button = new EntityUI(position_b, size, material_a, eUIButtonID::UI_BUTTON_EXIT);
 
     //TITLE
-    Vector2 position = Vector2(instance->window_width / 2, 50);
+    //Galactic
+    Vector2 position = Vector2(instance->window_width / 2, instance->window_height / 2 - 153);
     size = Vector2(472, 66);
 
+    Material material;
     material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-    material.diffuse = Texture::Get("data/Title/Galactic.png");
+    material.diffuse = Texture::Get("data/Title/Galactic1.png");
 
     title1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
 
-    position = Vector2(instance->window_width / 2, 150);
+    //Conqueror
+    position = Vector2(instance->window_width / 2, instance->window_height / 2 - 85);
     size = Vector2(613, 68);
 
     material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-    material.diffuse = Texture::Get("data/Title/Conqueror.png");
+    material.diffuse = Texture::Get("data/Title/Conqueror1.png");
 
     title2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
 
-    position = Vector2(instance->window_width / 2, 250);
+    //Sol Novus
+    position = Vector2(instance->window_width / 2, instance->window_height / 2);
     size = Vector2(543, 92);
 
     material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-    material.diffuse = Texture::Get("data/Title/SolNovus.png");
+    material.diffuse = Texture::Get("data/Title/SolNovus1.png");
 
     title3 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Fons Sol Novus
+    position = Vector2(instance->window_width / 2, instance->window_height / 2 - 10);
+    size = Vector2(705, 155);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/textures/MetalEnd_Small.png");
+
+    title4 = new EntityUI(position, size, material, eUIButtonID::UI_BACKGROUND);
 
     //BACKGROUND
     Texture* cube_texture = new Texture();
@@ -151,6 +165,7 @@ void MenuStage::render(Camera* camera) {
     }
 
     /*nou*/
+    title4->render(camera2d);
     title1->render(camera2d);
     title2->render(camera2d);
     title3->render(camera2d);
@@ -161,7 +176,9 @@ void MenuStage::render(Camera* camera) {
     exit_button->render(camera2d);
     /* -------------- AIXÒ ÉS NOU --------------*/
     //Draw Text
-    drawText(instance->window_width / 2, instance->window_height / 2, "Play", Vector3(0.0, 0.0, 0.0), 20);
+    Vector3 text_color = Vector3(0.0);
+    drawText((instance->window_width / 2) - 55, (instance->window_height - 167), "PLAY", text_color, 5);
+    drawText((instance->window_width / 2) - 55, (instance->window_height - 117), "EXIT", text_color, 5);
 }
 
 void MenuStage::update(double seconds_elapsed, Camera* camera) {
@@ -256,14 +273,239 @@ TutorialStage::TutorialStage() {
 
     Game* instance = Game::instance;
 
-    Vector2 position = Vector2(instance->window_width / 2, instance->window_height / 2);
-    Vector2 size = Vector2(175, 100);
+    //LORE DROP
+    // BLOC 1
+    Vector2 position = Vector2(instance->window_width / 2, 50);
+    Vector2 size = Vector2(720, 20);
 
     Material material;
     material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-    material.diffuse = Texture::Get("data/Title/spacebar.png");
+    material.diffuse = Texture::Get("data/Title/Lore1.png");
+
+    lore1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 100);
+    size = Vector2(720, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore2.png");
+
+    lore2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 125);
+    size = Vector2(720, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore3.png");
+
+    lore3 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 178, 150);
+    size = Vector2(370, 18);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore4.png");
+
+    lore4 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 5, 200);
+    size = Vector2(720, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore5.png");
+
+    lore5 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 3, 225);
+    size = Vector2(720, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore6.png");
+
+    lore6 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 3, 250);
+    size = Vector2(720, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore7.png");
+
+    lore7 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 305, 270);
+    size = Vector2(110, 15);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore8.png");
+
+    lore8 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 10, 325);
+    size = Vector2(700, 15);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore9.png");
+
+    lore9 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 + 3, 350);
+    size = Vector2(720, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore10.png");
+
+    lore10 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 185, 370);
+    size = Vector2(345, 15);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore11.png");
+
+    lore11 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2 - 50, 425);
+    size = Vector2(600, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore12.png");
+
+    lore12 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //BLOC 2
+
+    position = Vector2(instance->window_width / 2, 150);
+    size = Vector2(750, 25);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore13.png");
+
+    lore13 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 175);
+    size = Vector2(667, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore14.png");
+
+    lore14 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 200);
+    size = Vector2(620, 20);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore15.png");
+
+    lore15 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, 250);
+    size = Vector2(326, 26);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Lore16.png");
+
+    lore16 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //TUTORIAL BUTTONS
+    //Spacebar
+    position = Vector2(260, instance->window_height / 2 + 15);
+    size = Vector2(398, 74.67); //597, 112
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Spacebar.png");
 
     spacebar = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //P
+    position = Vector2(100, instance->window_height / 2 - 80);
+    size = Vector2(80, 80);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/P.png");
+
+    p = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Z
+    position = Vector2(100, instance->window_height / 2 - 175);
+    size = Vector2(80, 80);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Z.png");
+
+    z = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Arrows
+    position = Vector2(200, instance->window_height / 2 + 115);
+    size = Vector2(259.11, 80); //366, 113
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Arrows.png");
+
+    arrows = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Title2
+    position = Vector2(instance->window_width / 2, 50);
+    size = Vector2(331.51, 40);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Controls.png");
+
+    title2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //how to play 1
+    position = Vector2(instance->window_width / 2, instance->window_height - 50);
+    size = Vector2(395, 21.16);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/tutorial_text_1.png");
+
+    play1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //how to play 2
+    position = Vector2(instance->window_width / 2, instance->window_height - 80);
+    size = Vector2(500, 21.16);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/tutorial_text_2.png");
+
+    play2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Key Info 1 - Turbo
+    position = Vector2(instance->window_width / 2 - 100, instance->window_height / 2 - 175);
+    size = Vector2(251.32, 21.16);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/ActTurbo.png");
+
+    info1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Key Info 2 - Pausa
+    position = Vector2(instance->window_width / 2 - 100, instance->window_height / 2 - 80);
+    size = Vector2(232.78, 21.16);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/PauseMenu.png");
+
+    info2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Key Info 3 - Shoot
+    position = Vector2(instance->window_width / 2 + 150, instance->window_height / 2 + 15);
+    size = Vector2(94.70, 21.16);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Shoot.png");
+
+    info3 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Key Info 4
+    position = Vector2(instance->window_width / 2 + 50, instance->window_height / 2 + 115);
+    size = Vector2(168.25, 21.16);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Movement.png");
+
+    info4 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
 }
 
 void TutorialStage::render(Camera* camera) {
@@ -278,18 +520,102 @@ void TutorialStage::render(Camera* camera) {
         glEnable(GL_DEPTH_TEST);
     }
 
-    spacebar->render(camera2d);
-
+    if (block == 0) {
+        //bloc1
+        lore1->render(camera2d);
+    }
+    else if (block == 1) {
+        //bloc2
+        lore1->render(camera2d);
+        lore2->render(camera2d);
+        lore3->render(camera2d);
+        lore4->render(camera2d);
+    }
+    else if (block == 2) {
+        //bloc3
+        lore1->render(camera2d);
+        lore2->render(camera2d);
+        lore3->render(camera2d);
+        lore4->render(camera2d);
+        lore5->render(camera2d);
+        lore6->render(camera2d);
+        lore7->render(camera2d);
+        lore8->render(camera2d);
+    }
+    else if (block == 3) {
+        //bloc4
+        lore1->render(camera2d);
+        lore2->render(camera2d);
+        lore3->render(camera2d);
+        lore4->render(camera2d);
+        lore5->render(camera2d);
+        lore6->render(camera2d);
+        lore7->render(camera2d);
+        lore8->render(camera2d);
+        lore9->render(camera2d);
+        lore10->render(camera2d);
+        lore11->render(camera2d);
+    }
+    else if (block == 4) {
+        //bloc5
+        lore1->render(camera2d);
+        lore2->render(camera2d);
+        lore3->render(camera2d);
+        lore4->render(camera2d);
+        lore5->render(camera2d);
+        lore6->render(camera2d);
+        lore7->render(camera2d);
+        lore8->render(camera2d);
+        lore9->render(camera2d);
+        lore10->render(camera2d);
+        lore11->render(camera2d);
+        lore12->render(camera2d);
+    }
+    else if (block == 5) {
+        //bloc6
+        lore13->render(camera2d);
+        lore14->render(camera2d);
+        lore15->render(camera2d);
+    }
+    else if (block == 6) {
+        //bloc7
+        lore13->render(camera2d);
+        lore14->render(camera2d);
+        lore15->render(camera2d);
+        lore16->render(camera2d);
+    }
+    else if (block == 7) {
+        //bloc9 - tutorial 2
+        title2->render(camera2d);
+        spacebar->render(camera2d);
+        p->render(camera2d);
+        z->render(camera2d);
+        arrows->render(camera2d);
+        play1->render(camera2d);
+        play2->render(camera2d);
+        info1->render(camera2d);
+        info2->render(camera2d);
+        info3->render(camera2d);
+        info4->render(camera2d);
+    }
 }
 
 void TutorialStage::update(double seconds_elapsed, Camera* camera) {
     Game* instance = Game::instance;
-    /**/
+    /*
     if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
         instance->audio->Play("sounds/coin.wav");
         instance->setStage(PLAY_STAGE, TUTORIAL_STAGE);
     }
+    */
 
+    if (Input::isKeyPressed(SDL_SCANCODE_Z) && zWasPressed == false) { block++; }
+
+    if (block > 7) {
+        instance->setStage(PLAY_STAGE, TUTORIAL_STAGE);
+    }
+
+    zWasPressed = Input::isKeyPressed(SDL_SCANCODE_Z);
 }
 
 PlayStage::PlayStage() {
@@ -304,51 +630,6 @@ PlayStage::PlayStage() {
     Vector2 size;
     Material material_a;
 
-    /*
-    // -------------Barra de Vida - Position/Size-------------
-    position_a = Vector2(instance->window_width / 2, instance->window_height - 45);
-    size = Vector2(350, 30);
-
-    material_a.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/status_bar.fs"); //healthbar.fs // abans: status_bar.fs
-    material_a.diffuse = Texture::Get("data/textures/Healthy1_Large.png");
-    material_a.color = Vector4(0.25);
-
-    health_bar = new EntityUI(position_a, size, material_a, eUIButtonID::UI_HEALTHBAR);
-
-    // -------------Barra de Turbo - Position/Size-------------
-    position_a = Vector2(instance->window_width - 25, instance->window_height / 2);
-    size = Vector2(25, 267);
-
-    Material material_b;
-    material_b.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-    material_b.color = Vector4(1.0, 1.0, 0.0, 1.0);
-
-    turbo_bar = new EntityUI(position_a, size, material_b, eUIButtonID::UI_TURBO);
-    */
-
-    // -------------Marcador Turbo y/n - Position/Size-------------
-    /*
-    Vector2 position = Vector2(instance->window_width - 35, instance->window_height - 40);
-    size = Vector2(40, 40);
-
-    Material material;
-    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-    material.color = Vector4::WHITE;
-
-    turbo_indicator = new EntityUI(position, size, material, eUIButtonID::UI_TURBO_YN);
-    */
-
-    // -------------Marcador Temps fins el final del Nivell - Position/Size-------------
-    /*
-    position = Vector2(40, instance->window_height - 35);
-    size = Vector2(40, 40);
-
-    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-    material.color = Vector4::WHITE;
-
-    level_indicator = new EntityUI(position, size, material, eUIButtonID::UI_TIMETOEND);
-    */
-
     // -------------Bg-------------
     Vector2 position = Vector2(instance->window_width / 2, instance->window_height - 45);
     size = Vector2(450, 90);
@@ -358,16 +639,6 @@ PlayStage::PlayStage() {
     material_a.diffuse = Texture::Get("data/textures/SingleEdge_Large.png");
 
     healthbar_background = new EntityUI(position, size, material_a, eUIButtonID::UI_BACKGROUND);
-
-    // -------------Bg-T-------------
-    /**/
-    position = Vector2(instance->window_width - 25, instance->window_height / 2);
-    size = Vector2(450, 90);
-
-    material_a.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture_inv.fs");
-    material_a.diffuse = Texture::Get("data/textures/MetalEnd_Small.png");
-
-    turbo_bg = new EntityUI(position, size, material_a, eUIButtonID::UI_BACKGROUND);
 
     //SlotStripe_Black
     position = Vector2(55, instance->window_height - 55);
@@ -386,22 +657,21 @@ PlayStage::PlayStage() {
 
     turbo_indicator_bg = new EntityUI(position, size, material_a, eUIButtonID::UI_BACKGROUND);
 
+    //PAUSE MENU
+
     // Botó Resume i Exit
-    position = Vector2(instance->window_width / 2, instance->window_height - 150);
+    position = Vector2(instance->window_width / 2, instance->window_height - 250);
     size = Vector2(150, 40);
 
     Material material;
     material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
-    //material.color = Vector4::WHITE;
-    //material.diffuse = Texture::Get("data/textures/play.png");
 
     resume_button = new EntityUI(position, size, material, eUIButtonID::UI_BUTTON_RESUME);
 
-    position = Vector2(instance->window_width / 2, instance->window_height - 80);
+    position = Vector2(instance->window_width / 2, instance->window_height - 200);
 
     exit_button = new EntityUI(position, size, material, eUIButtonID::UI_BUTTON_EXIT);
 
-    /*nou*/
     //Shader fosc per a la pausa
     position = Vector2(instance->window_width / 2, instance->window_height / 2);
     size = Vector2(instance->window_width, instance->window_height);
@@ -480,7 +750,7 @@ void PlayStage::render(Camera* camera) {
         healthbar_background->render(camera2d);
         level_indicator_bg->render(camera2d);
         turbo_indicator_bg->render(camera2d);
-        turbo_bg->render(camera2d);
+        //turbo_bg->render(camera2d);
 
         //turbo_indicator->render(camera2d);
         //level_indicator->render(camera2d);
@@ -493,6 +763,10 @@ void PlayStage::render(Camera* camera) {
             pause_text->render(camera2d);
             resume_button->render(camera2d);
             exit_button->render(camera2d);
+
+            Vector3 text_color = Vector3(1.0);
+            drawText((instance->window_width / 2) - 55, (instance->window_height - 267), "PLAY", text_color, 5);
+            drawText((instance->window_width / 2) - 55, (instance->window_height - 217), "EXIT", text_color, 5);
         }
 
         /*----------------Això és nou----------------*/

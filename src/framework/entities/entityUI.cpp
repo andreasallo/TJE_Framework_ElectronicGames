@@ -86,7 +86,7 @@ void EntityUI::update(double seconds_elapsed) {
 		mouse_pos.y >(position.y - size.y * 0.5f) &&
 		mouse_pos.y < (position.y + size.y * 0.5f)) {
 
-		material.color = Vector4(1.25);
+		material.color = Vector4(0.5, 0.5, 1.25, 1);
 
 		if (Input::wasMouseReleased(SDL_BUTTON_LEFT)) {
 			switch (button_id)
@@ -115,17 +115,11 @@ void EntityUI::update(double seconds_elapsed) {
 		else if (Input::isMousePressed(SDL_BUTTON_LEFT)) {
 			/*----------------Això és nou----------------*/
 			//h canviat llegerament el color
-			material.color = Vector4(0.8f, 0.8f, 0.8f, 1.0f);
+			material.color = Vector4(0.25f, 0.25f, 1.0f, 1.0f);
 		}
 	}
-	/* -------------- AIXÒ ÉS NOU --------------*/
-	//però no fa res lol
-	else if (button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_PLAY) {
-		material.color = Vector4::WHITE;
-	}
-	else if (button_id == UI_HEALTHBAR) {
-	}
-	else if (button_id == UI_TURBO) {
+	else if ((button_id == UI_BUTTON_PLAY || button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_RESUME)) {
+		material.color = Vector4::BLUE;
 	}
 }
 

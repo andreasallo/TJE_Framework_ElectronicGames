@@ -202,6 +202,23 @@ void Player::update(float dt)
     model.rotate(visualPitch, Vector3(1, 0, 0));
     model.rotate(visualRoll, Vector3(0, 0, 1));
 
+    if (lives != previous_lives) {
+        time_to_heal = 3.0f;
+    }
+
+    //Al cap de 3 segons recupera la vida del jugador. Des de l'últim cop que ha rebut la nau.
+    if (lives < max_lives) {
+        time_to_heal -= dt;
+
+        if (time_to_heal < 0.0f) {
+            time_to_heal = 3.0f;
+            lives = max_lives;
+            health_bar->mask = max_lives / lives;
+        }
+    }
+
+    previous_lives = lives;
+
     //turbo
     /*
     if (turbo)

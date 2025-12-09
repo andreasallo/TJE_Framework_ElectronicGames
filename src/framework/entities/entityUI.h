@@ -22,6 +22,7 @@ enum eUIButtonID {
 	UI_BACKGROUND,
 	UI_BUTTON_RESUME,
 	UI_TEXT,
+	UI_BUTTON_EXIT_TITLE,
 };
 
 class EntityUI : public EntityMesh {

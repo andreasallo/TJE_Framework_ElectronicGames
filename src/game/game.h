@@ -11,6 +11,7 @@
 class Stage;
 class World;
 class Audio;
+class PlayStage;
 /* -------------- AIXÒ ÉS NOU --------------*/
 // sinó no funciona la nova declaració de setStage
 enum eStage;
@@ -48,6 +49,7 @@ public:
 
 	//stage
 	Stage* current_stage;
+	PlayStage* play_stage;
 
 	//some vars
 	Camera* camera; //our global camera

@@ -24,7 +24,6 @@ World* World::instance = NULL;
 bool Game::debug = false;
 
 MenuStage* menu_stage;
-PlayStage* play_stage;
 TutorialStage* tutorial_stage;
 EndStage* end_stage;
 
@@ -94,7 +93,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 		root->addChild(entity);
 	}*/
 
-	current_stage = menu_stage;
+	current_stage = end_stage;
 	Stage::onEnter(eStage::MAIN_MENU);
 
 	/*

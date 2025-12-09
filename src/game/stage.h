@@ -182,6 +182,16 @@ class EndStage : public Stage {
 public:
 	eStage type = END_STAGE;
 
+	bool zWasPressed = false;
+
+	EntityUI* title1 = nullptr;
+	EntityUI* title2_1 = nullptr;
+	EntityUI* title2_2 = nullptr;
+
+	EntityUI* results = nullptr;
+
+	EntityMesh* skybox;
+
 	EndStage();
 
 	void render(Camera* camera);

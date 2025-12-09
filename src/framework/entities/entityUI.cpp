@@ -80,7 +80,7 @@ void EntityUI::update(double seconds_elapsed) {
 
 	/*----------------Això és nou----------------*/
 	//he  posat que només entri si el tipus de EntityUI és un tipus 'button'
-	if ((button_id == UI_BUTTON_PLAY || button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_RESUME) &&
+	if ((button_id == UI_BUTTON_PLAY || button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_RESUME || button_id == UI_BUTTON_EXIT_TITLE) &&
 		mouse_pos.x > (position.x - size.x * 0.5f) &&
 		mouse_pos.x < (position.x + size.x * 0.5f) &&
 		mouse_pos.y >(position.y - size.y * 0.5f) &&
@@ -98,6 +98,10 @@ void EntityUI::update(double seconds_elapsed) {
 				break;
 				/*----------------Això és nou----------------*/
 				//el case del nou botó de la pantalla de pausa
+			case UI_BUTTON_EXIT_TITLE:
+				instance->setStage(MAIN_MENU, PLAY_STAGE);
+				instance->play_stage->world->level_finished = true;
+				break;
 			case UI_BUTTON_RESUME:
 				instance->isPaused = false;
 				break;
@@ -118,7 +122,7 @@ void EntityUI::update(double seconds_elapsed) {
 			material.color = Vector4(0.25f, 0.25f, 1.0f, 1.0f);
 		}
 	}
-	else if ((button_id == UI_BUTTON_PLAY || button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_RESUME)) {
+	else if ((button_id == UI_BUTTON_PLAY || button_id == UI_BUTTON_EXIT || button_id == UI_BUTTON_RESUME || button_id == UI_BUTTON_EXIT_TITLE)) {
 		material.color = Vector4::BLUE;
 	}
 }

@@ -157,14 +157,19 @@ void AsteroidControl::update(float dt)
                 World::instance->destroyEntity(a);  // ← LO METEMOS EN LA LISTA DE BORRADO
 
                 player->previous_lives = player->lives;
-                player->lives = std::max(0, player->lives - 1);
+                player->lives -= 1; //std::max(0, player->lives - 1);
                 player->health_bar->mask = (float)player->lives / player->max_lives;
                 World::instance->chromatic_aberration_timer = 1.0f;
                 Audio::Play("data/crash.wav", 1.0f, BASS_SAMPLE_MONO);
 
-                if (player->lives <= 0) {
+                if (player->lives <= -1) { //-1
+                    /*NOU NOU NOU*/
+                    Game* instance = Game::instance;
+
                     player->isDestroyed = true;
+                    World::instance->level_finished = true;
                     std::cout << "GAME OVER" << std::endl;
+                    instance->setStage(END_STAGE, PLAY_STAGE);
                 }
             }
         }

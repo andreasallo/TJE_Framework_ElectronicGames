@@ -66,12 +66,12 @@ World::World() {
 	{
 		Texture* cube_texture = new Texture();
 		cube_texture->loadCubemap("ProbaCubeMap", {
-			"data/space_cube/px.png",
-			"data/space_cube/nx.png",
-			"data/space_cube/ny.png",
-			"data/space_cube/py.png",
-			"data/space_cube/pz.png",
-			"data/space_cube/nz.png"
+			"data/space_cube_new/px.png",
+			"data/space_cube_new/nx.png",
+			"data/space_cube_new/ny.png",
+			"data/space_cube_new/py.png",
+			"data/space_cube_new/pz.png",
+			"data/space_cube_new/nz.png"
 			});
 
 		Material cubemap_material;

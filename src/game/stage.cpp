@@ -19,17 +19,24 @@ enum MenuOptions {
     MENU_TOTAL
 };
 
+HCHANNEL title_screen;
+HCHANNEL gameplay;
 
 /* -------------- AIXÒ ÉS NOU --------------*/
 void Stage::onEnter(eStage next_stage) {
-    Game* instance = Game::instance;
+    PlayStage* play_stage = Game::instance->play_stage;
+    Stage* stage = Game::instance->current_stage;
 
     switch (next_stage) {
     case PLAY_STAGE:
-        //Audio::Play("data/atmospheric.wav", 1.0f, BASS_SAMPLE_LOOP);
+        //comprova que la partida anterior ha acabat abans de iniciar el joc, i si ho ha fet, crea un nou world, reutilitzant la instància de world del play stage.
+        if (play_stage->world->level_finished) {
+            play_stage->world = new World();
+        }
+        gameplay = Audio::Play("data/atmospheric.wav", 1.0f, BASS_SAMPLE_LOOP);
         break;
     case MAIN_MENU:
-        //Audio::Play("data/mus_theme_rep.mp3", 1.0f, BASS_SAMPLE_LOOP);
+        title_screen = Audio::Play("data/mus_theme_rep.mp3", 1.0f, BASS_SAMPLE_LOOP);
         break;
     case TUTORIAL_STAGE:
         break;
@@ -40,12 +47,16 @@ void Stage::onEnter(eStage next_stage) {
 
 
 void Stage::onExit(eStage last_stage) {
+    Stage* stage = Game::instance->current_stage;
+
     switch (last_stage) {
     case PLAY_STAGE:
+        Audio::Stop(gameplay);
         break;
     case MAIN_MENU:
         break;
     case TUTORIAL_STAGE:
+        Audio::Stop(title_screen);
         break;
     case END_STAGE:
         break;
@@ -609,6 +620,7 @@ void TutorialStage::update(double seconds_elapsed, Camera* camera) {
     }
     */
 
+    if (Input::isKeyPressed(SDL_SCANCODE_S)) { block = 7; }
     if (Input::isKeyPressed(SDL_SCANCODE_Z) && zWasPressed == false) { block++; }
 
     if (block > 7) {
@@ -661,7 +673,7 @@ PlayStage::PlayStage() {
 
     // Botó Resume i Exit
     position = Vector2(instance->window_width / 2, instance->window_height - 250);
-    size = Vector2(150, 40);
+    size = Vector2(200, 40);
 
     Material material;
     material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
@@ -670,7 +682,7 @@ PlayStage::PlayStage() {
 
     position = Vector2(instance->window_width / 2, instance->window_height - 200);
 
-    exit_button = new EntityUI(position, size, material, eUIButtonID::UI_BUTTON_EXIT);
+    exit_button = new EntityUI(position, size, material, eUIButtonID::UI_BUTTON_EXIT_TITLE); //canviar aquest botó per què et torni al main menu
 
     //Shader fosc per a la pausa
     position = Vector2(instance->window_width / 2, instance->window_height / 2);
@@ -765,7 +777,7 @@ void PlayStage::render(Camera* camera) {
             exit_button->render(camera2d);
 
             Vector3 text_color = Vector3(1.0);
-            drawText((instance->window_width / 2) - 55, (instance->window_height - 267), "PLAY", text_color, 5);
+            drawText((instance->window_width / 2) - 85, (instance->window_height - 267), "RESUME", text_color, 5);
             drawText((instance->window_width / 2) - 55, (instance->window_height - 217), "EXIT", text_color, 5);
         }
 
@@ -830,7 +842,7 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
 
 EndStage::EndStage() {
     Game* instance = Game::instance;
-
+    /*
     // Imatge que ocupa tota la pantalla
     Vector2 position = Vector2(instance->window_width * 0.5f, instance->window_height * 0.5f);
     Vector2 size = Vector2(instance->window_width, instance->window_height);
@@ -840,13 +852,69 @@ EndStage::EndStage() {
     mat.diffuse = Texture::Get("data/endpic.png");  
 
     end_screen = new EntityUI(position, size, mat, eUIButtonID::UI_BACKGROUND);
+    */
+
+    //BACKGROUND
+    Texture* cube_texture = new Texture();
+    cube_texture->loadCubemap("ProbaCubeMap", {
+        "data/space_cube_new/px.png",
+        "data/space_cube_new/nx.png",
+        "data/space_cube_new/ny.png",
+        "data/space_cube_new/py.png",
+        "data/space_cube_new/pz.png",
+        "data/space_cube_new/nz.png"
+        });
+
+    Material cubemap_material;
+    cubemap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/cubemap.fs");
+    cubemap_material.diffuse = cube_texture;
+
+    skybox = new EntityMesh(Mesh::Get("data/cubemap.ASE"), cubemap_material);
+
+    //Game Over
+    Vector2 position = Vector2(instance->window_width / 2, instance->window_height / 2);
+    Vector2 size = Vector2(741, 66);
+
+    Material material;
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/MissionFailed2.png");
+
+    title1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Game Complete
+    position = Vector2(instance->window_width / 2, instance->window_height / 2 - 250);
+    size = Vector2(358, 66);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Mission.png");
+
+    title2_1 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    position = Vector2(instance->window_width / 2, instance->window_height / 2 - 160);
+    size = Vector2(744, 66);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Accomplished.png");
+
+    title2_2 = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
+
+    //Results:
+    position = Vector2(instance->window_width / 2, instance->window_height / 2 - 50);
+    size = Vector2(243, 40);
+
+    material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    material.diffuse = Texture::Get("data/Title/Results.png");
+
+    results = new EntityUI(position, size, material, eUIButtonID::UI_TEXT);
 }
 
 
 void EndStage::render(Camera* camera) {
     Game* instance = Game::instance;
-    Camera* cam2d = instance->camera2d;
+    Player* player = Player::instance;
+    Camera* cam2d = Game::instance->camera2d;
 
+    /*
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
@@ -860,8 +928,39 @@ void EndStage::render(Camera* camera) {
     }
 
     glEnable(GL_DEPTH_TEST);
+    */
+
+    if (skybox) {
+        skybox->model.setTranslation(camera->eye);
+
+        glDisable(GL_DEPTH_TEST);
+        skybox->render(camera);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    if (player->isDestroyed) {
+        title1->render(cam2d);
+    }
+    else {
+        title2_1->render(cam2d);
+        title2_2->render(cam2d);
+        results->render(cam2d);
+
+        drawText(instance->window_width / 2, instance->window_height / 2, "Score:", Vector3(1.0), 5);
+    }
 }
 
 void EndStage::update(double seconds_elapsed, Camera* camera) {
+    Game* instance = Game::instance;
+    /*
+    if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
+        instance->audio->Play("sounds/coin.wav");
+        instance->setStage(MAIN_MENU, END_STAGE);
+    }
+    */
 
+    //temporitzador de 1s per què no s'en vagi directament al menú principal si estàs presionant Z
+    if (Input::isKeyPressed(SDL_SCANCODE_Z) && zWasPressed == false) { instance->setStage(MAIN_MENU, END_STAGE); }
+    
+    zWasPressed = Input::isKeyPressed(SDL_SCANCODE_Z);
 }

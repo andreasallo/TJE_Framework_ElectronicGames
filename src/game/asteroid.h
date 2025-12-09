@@ -4,7 +4,7 @@
 class Asteroid : public EntityCollider {
 public:
 
-    float speed = 30.0f; // velocitat base
+    float speed = 10.0f; // velocitat base
     float radius = 1.2f; // per a col·lisions senzilles
     bool toDelete = false;
 

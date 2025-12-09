@@ -48,7 +48,7 @@ public:
 
 	EntityMesh* end_planet = nullptr;
 
-
+	float planet_initial_z = 0.0f;
 	AsteroidControl asteroidControl;
 	RingControl ringControl;
 	ChunkGenerator chunkGen;

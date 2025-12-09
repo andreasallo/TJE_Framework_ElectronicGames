@@ -829,11 +829,37 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
 }
 
 EndStage::EndStage() {
+    Game* instance = Game::instance;
 
+    // Imatge que ocupa tota la pantalla
+    Vector2 position = Vector2(instance->window_width * 0.5f, instance->window_height * 0.5f);
+    Vector2 size = Vector2(instance->window_width, instance->window_height);
+
+    Material mat;
+    mat.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    mat.diffuse = Texture::Get("data/endpic.png");  
+
+    end_screen = new EntityUI(position, size, mat, eUIButtonID::UI_BACKGROUND);
 }
 
-void EndStage::render(Camera* camera) {
 
+void EndStage::render(Camera* camera) {
+    Game* instance = Game::instance;
+    Camera* cam2d = instance->camera2d;
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    // Fons negre (per si la imatge té transparència)
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // La teva imatge a pantalla completa
+    if (end_screen) {
+        end_screen->render(cam2d);
+    }
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void EndStage::update(double seconds_elapsed, Camera* camera) {

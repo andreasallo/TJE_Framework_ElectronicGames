@@ -1,4 +1,4 @@
-#include "asteroidControl.h"
+﻿#include "asteroidControl.h"
 #include "game/asteroid.h"
 #include "framework/world.h"
 #include "graphics/mesh.h"
@@ -9,7 +9,7 @@
 #include "game/player.h"
 #include "framework/audio.h"
 
-
+/*
 
 void AsteroidControl::init()
 {
@@ -63,11 +63,10 @@ void AsteroidControl::update(float dt)
                     player->isDestroyed = true;
                 }
 
-                /*----------------Aix� �s nou----------------*/
+                //----------------Això és nou----------------
                 //actualitza la mask de la barra de vida quan la nau rep un cop
                 player->health_bar->mask = (float)(player->lives / player->max_lives);
 
-              
                 World::instance->chromatic_aberration_timer = 1.0f;
 
                 Audio::Play("data/crash.wav", 1.0f, BASS_SAMPLE_MONO);
@@ -109,4 +108,81 @@ void AsteroidControl::spawnAsteroid()
     float z = pos.z + random(80.0f, 140.0f);
     float s = random(2.0f, 6.0f);
     spawnAsteroidAt(x, y, z, s);
+}*/
+
+
+// asteroidControl.cpp
+#include "asteroidControl.h"
+#include "game/asteroid.h"
+#include "framework/world.h"
+#include "graphics/mesh.h"
+#include "graphics/shader.h"
+#include "graphics/texture.h"
+#include "framework/utils.h"
+#include "framework/collision.h"
+#include "game/player.h"
+#include "framework/audio.h"
+
+void AsteroidControl::init() {
+    asteroidMesh = Mesh::Get("data/meteorito.obj");
+    asteroidMat.diffuse = Texture::Get("data/StoneFloorTexture.png");
+    asteroidMat.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
+    spawnTimer = 0.0f;  // No se usa más
+}
+
+void AsteroidControl::update(float dt)
+{
+    Player* player = World::instance->player;
+    float worldSpeedFactor = (player && player->turbo) ? 2.0f : 1.0f;
+
+    // 1. Update movimiento
+    for (Asteroid* a : asteroids) {
+        if (!a || a->toDelete) continue;
+        float originalSpeed = a->speed;
+        a->speed *= worldSpeedFactor;
+        a->update(dt);
+        a->speed = originalSpeed;
+    }
+
+    // 2. Colisiones → marcamos toDelete y llamamos destroyEntity (como hacías tú)
+    if (player) {
+        for (Asteroid* a : asteroids) {
+            if (!a || a->toDelete) continue;
+
+            std::vector<sCollisionData> results;
+            bool hit = Collision::TestEntitySphere(a, player->collision_radius, player->getCollisionCenter(), results, eCollisionFilter::ENEMY);
+
+            if (hit) {
+                a->toDelete = true;
+                World::instance->destroyEntity(a);  // ← LO METEMOS EN LA LISTA DE BORRADO
+
+                player->previous_lives = player->lives;
+                player->lives = std::max(0, player->lives - 1);
+                player->health_bar->mask = (float)player->lives / player->max_lives;
+                World::instance->chromatic_aberration_timer = 1.0f;
+                Audio::Play("data/crash.wav", 1.0f, BASS_SAMPLE_MONO);
+
+                if (player->lives <= 0) {
+                    player->isDestroyed = true;
+                    std::cout << "GAME OVER" << std::endl;
+                }
+            }
+        }
+    }
+
+    // 3. Solo quitamos del vector los que están marcados (NO los borramos otra vez)
+    asteroids.erase(
+        std::remove_if(asteroids.begin(), asteroids.end(),
+            [](Asteroid* a) { return a == nullptr || a->toDelete; }),
+        asteroids.end()
+    );
+}
+
+void AsteroidControl::spawnAsteroidAt(float x, float y, float z, float speed) {
+    Asteroid* a = new Asteroid(asteroidMesh, asteroidMat, "asteroid");
+    a->model.setTranslation(x, y, z);
+    a->speed = speed;
+    a->layer = eCollisionFilter::ENEMY;
+    World::instance->addEntity(a);           // ← Usa addEntity (mejor que root->addChild directo)
+    asteroids.push_back(a);
 }

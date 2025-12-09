@@ -186,4 +186,6 @@ public:
 
 	void render(Camera* camera);
 	void update(double seconds_elapsed, Camera* camera);
+private:
+	EntityUI* end_screen = nullptr;
 };

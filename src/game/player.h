@@ -27,7 +27,7 @@ private:
 	float targetSpeed = 0.0f;    // Velocidad a la que queremos llegar
 	float acceleration = 40.0f;  // Qué tan rápido acelera
 	float rotation_speed = 1.5f; // Velocidad de giro
-	float forwardSpeed = 0.0f;  // velocitat constant cap endavant
+	
 
 	
 	float visualPitch = 0.0f;
@@ -54,7 +54,7 @@ public:
 	//float height = 0.6f;
 
 	float lateralSpeed = 8.0f;
-
+	float forwardSpeed = 0.0f;  // velocitat constant cap endavant
 	bool isDestroyed = false;
 
 	int lives = 3;
@@ -69,7 +69,7 @@ public:
 
 	// Límits del túnel
 	float minX = -12.0f, maxX = 12.0f;
-	float minY = -6.0f, maxY = 20.0f;
+	float minY = 0.0f, maxY = 24.0f;
 
 	//TURBO VARIABLES
 	bool turbo = false;

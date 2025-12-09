@@ -21,6 +21,6 @@ public:
 
     void init();
     void update(float dt);
-    void spawnRingAt(float x, float y, float z);
+    void spawnRingAt(float x, float y, float z, float speed);
     void spawnRing();
 };

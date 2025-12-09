@@ -8,7 +8,7 @@
 
 class Ring : public EntityCollider {
 public:
-    float speed = 30.0f; //Velocitat cap al jugador
+    float speed = 10.0f; //Velocitat cap al jugador
     //float radius = 3.0f;//Radi de col·lisió
     //float inner_radius = 3.0f;
 

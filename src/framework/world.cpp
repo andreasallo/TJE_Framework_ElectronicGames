@@ -40,16 +40,15 @@ World::World() {
 	planet_material.diffuse = Texture::Get("data/planeta/RP-0002-N.png");
 	planet_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
 	end_planet = new EntityMesh(Mesh::Get("data/planeta/RP-0002-N.obj"), planet_material, "EndPlanet");
-
-	// POSAR-L'HO LLUNY I ESCALA 0 -> invisible al principi
-	end_planet->model.setTranslation(0.0f, 0.0f, -20); // fora de l'àrea de joc
-	end_planet->model.setScale(0.001f, 0.001f, 0.001f);     // pràcticament invisible
+	end_planet->model.setTranslation(0.0f, 0.0f, -20);
+	end_planet->model.setScale(0.001f, 0.001f, 0.001f);
 	end_planet->culling = false;
 	root->addChild(end_planet);
 
 	// Chunk generator
-	chunkGen.init(2000.0f, 120.0f);
-	lastSpawnedChunkZ = -10000.0f;
+	// init( ZonaSeguraInicial, LongitudDelPatron, LongitudTotalDelNivel )
+	chunkGen.init(300.0f, 120.0f, 3000.0f);
+	lastSpawnedChunkZ = chunkGen.safeZoneInitial - chunkGen.chunkLength;  // Preparar primer spawn
 
 	// Player
 	Material player_material;
@@ -245,83 +244,6 @@ void World::spawnExplosion(const Vector3& pos)
 
 
 
-/*
-void World::shootLaser()
-{
-	
-	Vector3 front = player->model.frontVector().normalize();
-	Vector3 right = player->model.rightVector().normalize(); // Usar el right vector del jugador
-	Vector3 up = player->model.topVector().normalize();
-	Vector3 dir = front;
-
-	Vector3 origin = player->model.getTranslation() + (dir * 20.0f); //afegir 20 pk sino surt desde el cul d la nau
-
-	float rayLength = 40.0f;
-	float laserRadius = 1.0f;
-	
-
-	// ---- DETECTAR COL·LISIÓ AMB RAY ----
-	sCollisionData hit;
-	hit.distance = rayLength;
-
-	for (Asteroid* a : asteroidControl.asteroids)
-	{
-		if (!a || a->toDelete) continue;
-
-		Collision::TestEntityRay(a, origin, dir, hit,
-			eCollisionFilter::ENEMY,
-			true,
-			rayLength);
-	}
-
-	if (hit.collider)
-	{
-		Asteroid* a = (Asteroid*)hit.collider;
-		a->toDelete = true;
-		destroyEntity(a);
-
-		//coins sum
-		player->coins_collected++;
-		std::cout << "Asteroid destroyed! Coins: " << player->coins_collected << std::endl;
-	}
-
-	// ---- CREAR EL LASER VISUAL ----
-	Mesh* m = new Mesh();
-	m->createCube(); // cub base
-
-	Material mat;
-	mat.diffuse = Texture::Get("data/textures/texture.tga"); 
-	mat.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-	mat.color = Vector4(0.0f, 1.0f, 1.0f, 1.0f); // cian brillant
-
-	laserBeam = new EntityMesh(m, mat, "laser");
-	laserBeam->layer = eCollisionFilter::NONE;
-
-	// Escala.
-	float laserThickness = 0.4f;
-	Matrix44 model;
-
-	
-	model.setTranslation(origin + dir * (rayLength * 0.5f));
-	model.scale(laserThickness, laserThickness, rayLength);
-
-	Vector3 right = dir.cross(Vector3(0, 1, 0)).normalize();
-	Vector3 up = right.cross(dir).normalize();
-	model.setUpAndOrthonormalize(up);
-	model.setFrontAndOrthonormalize(dir);
-
-	model.setTranslation(origin + dir * (rayLength * 0.5f));
-	model.scale(laserThickness, laserThickness, rayLength);
-
-	laserBeam->model = model;
-
-	root->addChild(laserBeam);
-
-	laserTimer = 0.08f; // dura 1–2 frames
-}*/
-
-
-
 
 void World::requestShoot()
 {
@@ -342,18 +264,67 @@ void World::requestShoot()
 // ----------------- Update (World::update) -----------------
 void World::update(float delta_time)
 {
-	
+
 	player->update(delta_time);
 	updateCamera(delta_time);
+	chunkGen.update(delta_time, player->model.getTranslation().z);
+
+	// Actualizar obstáculos
+	asteroidControl.update(delta_time);
+	ringControl.update(delta_time);
+
+	if (player)
+	{
+		float playerZ = player->model.getTranslation().z;
+		float progress = (playerZ - chunkGen.safeZoneInitial) /
+			(chunkGen.totalLevelLength - chunkGen.safeZoneInitial);
+
+		if (progress >= 0.95f)
+		{
+			player->turbo = false;                    // no hi ha turbo
+			player->forwardSpeed = 5.0f;             // velocitat molt lenta
+			// Audio::Play("data/final_approach.wav", 0.6f); // opcional
+		}
+	}
 
 	//logica normal
-	if (!level_finished)
-	{
-		// Actualizar obstáculos
-		asteroidControl.update(delta_time);
-		ringControl.update(delta_time);
-		chunkGen.update(delta_time, player->model.getTranslation());
+	if (level_finished) {  // ← FIX: només quan finished
+		final_sequence_timer += delta_time;
 
+		float worldSpeedFactor = (player && player->turbo) ? 2.0f : 1.0f;
+		float approachSpeed = 80.0f * worldSpeedFactor;
+		float growthSpeed = 30.0f;
+		float rotationSpeed = 0.1f;
+
+		float currentZ = planet_initial_z - (approachSpeed * final_sequence_timer);
+		float currentScale = 10.0f + (growthSpeed * final_sequence_timer);
+
+		Matrix44 m;
+		m.setIdentity();
+		m.setTranslation(0.0f, 0.0f, currentZ);
+		m.rotate(final_sequence_timer * rotationSpeed, Vector3(0, 1, 0));
+		m.scale(currentScale, currentScale, currentScale);
+
+		end_planet->model = m;
+
+		float planetBaseRadius = end_planet->mesh->box.halfsize.x;
+
+		// Multiplicamos por la escala actual para obtener el radio real en pantalla
+		float planetRealRadius = planetBaseRadius * currentScale * 0.95f;
+		float distance = end_planet->model.getTranslation().distance(player->model.getTranslation());
+
+		if (!final_collided && distance < (planetRealRadius + player->collision_radius)) {
+			final_collided = true;
+			std::cout << "COLISION CON PLANETA (SUPERFICIE). ENDSTAGE." << std::endl;
+			Game::instance->setStage(END_STAGE, PLAY_STAGE);
+		}
+	}
+		
+		/*
+		chunkGen.update(delta_time, player->model.getTranslation().z);
+		
+
+		
 		// Generar chunks
 		for (const sChunk& c : chunkGen.getChunks())
 		{
@@ -377,7 +348,7 @@ void World::update(float delta_time)
 			final_sequence_timer = 0.0f; //animacio
 			final_collided = false;
 
-			
+
 			//long + distncia inicial
 			float startZ = chunkGen.levelLength + 400.0f;
 
@@ -415,17 +386,18 @@ void World::update(float delta_time)
 		m.rotate(final_sequence_timer * rotationSpeed, Vector3(0, 1, 0)); // Luego Rotación
 		m.scale(currentScale, currentScale, currentScale); // Finalmente Escala
 
-	
+
 		end_planet->model = m;
 
 		// DETECTAR COLISIÓN FINAL
-		
+
 		if (!final_collided && currentZ < player->model.getTranslation().z + 20.0f)
 		{
 			final_collided = true;
 			std::cout << "COLISION CON PLANETA. ENDSTAGE." << std::endl;
 		}
-	}
+	}*/
+	
 
 	// --- GESTIÓN DE PROYECTILES (NUEVO SISTEMA) ---
 
@@ -486,6 +458,19 @@ void World::update(float delta_time)
 			chromatic_aberration_timer = 0.0f;
 	}
 
+	if (damage_smoke_timer > 0.0f)
+	{
+		damage_smoke_timer -= delta_time;
+		damage_smoke_emitter->setEmissionEnabled(true);
+		if (player) {
+			damage_smoke_emitter->setEmitPosition(player->model.getTranslation());
+		}
+		if (damage_smoke_timer <= 0.0f) {
+			damage_smoke_emitter->setEmissionEnabled(false);
+			damage_smoke_timer = 0.0f;
+		}
+	}
+	damage_smoke_emitter->update(delta_time);
 
 
 	// 3) Limpieza de entidades

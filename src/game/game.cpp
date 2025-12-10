@@ -57,53 +57,19 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 	camera2d->view_matrix = Matrix44(); // Set View to identity
 	camera2d->setOrthographic(0, window_width, window_height, 0, -1, 1);
 	camera2d->updateProjectionMatrix();
-	//shader->setUniform("u_viewprojection", camera2d->viewprojection_matrix);
 
 
-	//world = new World();
-
+	// Stage
 	menu_stage = new MenuStage();
 	play_stage = new PlayStage();
-	//constructor dels nous stage
 	tutorial_stage = new TutorialStage();
 	end_stage = new EndStage();
-
-	/*//CREATE HEIGHTMAP
-	{
-		float size = 50.0f;
-
-		Mesh* heightmap_mesh = new Mesh();
-		heightmap_mesh->createSubdividedPlane(size);
-
-		Material heightmap_material;
-		heightmap_material.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-		heightmap_material.diffuse = Texture::Get("data/textures/heightmap.png");
-		heightmap_material.color = Vector4(1.0, 1.0, 1.0, 1.0);
-
-		EntityMesh* heightmap = new EntityMesh(heightmap_mesh, heightmap_material);
-		heightmap->culling = false;
-		heightmap->model.translate(-size * 0.5f, 0.0f, -size * 0.5f);
-		root->addChild(heightmap);
-	}
-
-	{
-		/*Material material;
-		material.diffuse= Texture::Get("data/textures/texture.tga");
-		EntityMesh* entity = new EntityMesh(Mesh::Get("data/meshes/box.ASE"), material, "box");
-		root->addChild(entity);
-	}*/
 
 	current_stage = menu_stage;
 	Stage::onEnter(eStage::MAIN_MENU);
 
-	/*
-	*/
-
+	// Audio
 	Audio::Init();
-
-	//audio = new Audio();
-	//audio->Play("sounds/coin.wav");
-
 
 	// Example of shader loading using the shaders manager
 	shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
@@ -116,6 +82,7 @@ Game::Game(int window_width, int window_height, SDL_Window* window)
 void Game::render(void)
 {
 	//és necessari per a pintar un frame
+	
 	// Set the clear color (the background color)
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -137,7 +104,6 @@ void Game::update(double seconds_elapsed)
 	current_stage->update(seconds_elapsed, camera);
 }
 
-/* -------------- AIXÒ ÉS NOU --------------*/
 // he afegit onExit i onEnter a setStage per què ho faci cada vegada que canviem
 void Game::setStage(eStage new_stage, eStage last_stage) {
 	Stage::onExit(last_stage);

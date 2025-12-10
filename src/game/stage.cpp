@@ -22,7 +22,6 @@ enum MenuOptions {
 HCHANNEL title_screen;
 HCHANNEL gameplay;
 
-/* -------------- AIXÒ ÉS NOU --------------*/
 void Stage::onEnter(eStage next_stage) {
     PlayStage* play_stage = Game::instance->play_stage;
     Stage* stage = Game::instance->current_stage;
@@ -52,6 +51,7 @@ void Stage::onExit(eStage last_stage) {
     switch (last_stage) {
     case PLAY_STAGE:
         Audio::Stop(gameplay);
+        Game::instance->isPaused = false;
         break;
     case MAIN_MENU:
         break;
@@ -65,18 +65,7 @@ void Stage::onExit(eStage last_stage) {
 
 
 MenuStage::MenuStage() {
-    /*
-    background.loadTGA("data/2.tga");
 
-    background.flipY();
-
-    if (background.data) {
-        background_tex = new Texture(&background);
-    }
-    */
-
-    /* -------------- AIXÒ ÉS NOU --------------*/
-    //He afegit tot això inicialitza els botons del menú d'inici
     Game* instance = Game::instance;
 
     Vector2 position_a = Vector2(instance->window_width / 2, instance->window_height - 150);
@@ -86,7 +75,6 @@ MenuStage::MenuStage() {
     Material material_a;
     material_a.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/flat.fs");
     material_a.color = Vector4::BLUE;
-    //material.diffuse = Texture::Get("data/textures/play.png");
 
     start_button = new EntityUI(position_a, size, material_a, eUIButtonID::UI_BUTTON_PLAY);
     exit_button = new EntityUI(position_b, size, material_a, eUIButtonID::UI_BUTTON_EXIT);
@@ -149,8 +137,6 @@ MenuStage::MenuStage() {
 
 void MenuStage::render(Camera* camera) {
 
-    //camera->enable();
-    /*nou*/
     if (skybox) {
         skybox->model.setTranslation(camera->eye);
 
@@ -164,28 +150,24 @@ void MenuStage::render(Camera* camera) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    /* -------------- AIXÒ ÉS NOU --------------*/
-    //Guarda linstancies de la camara 2d i del joc
+    //Guarda les instancies de la camara 2d i del joc
     Game* instance = Game::instance;
     Camera* camera2d = instance->camera2d;
 
-    /**/
     if (background_tex) {
         //toViewport dibuixa la textura a tota la pantalla
         background_tex->toViewport();
     }
 
-    /*nou*/
     title4->render(camera2d);
     title1->render(camera2d);
     title2->render(camera2d);
     title3->render(camera2d);
 
-    /* -------------- AIXÒ ÉS NOU --------------*/
     //utilitza la camara 2d per a renderitzar cada un dels botons
     start_button->render(camera2d);
     exit_button->render(camera2d);
-    /* -------------- AIXÒ ÉS NOU --------------*/
+
     //Draw Text
     Vector3 text_color = Vector3(0.0);
     drawText((instance->window_width / 2) - 55, (instance->window_height - 167), "PLAY", text_color, 5);
@@ -194,76 +176,12 @@ void MenuStage::render(Camera* camera) {
 
 void MenuStage::update(double seconds_elapsed, Camera* camera) {
     Game* instance = Game::instance;
-    //start_button->update();
-    //SDL_PollEvent(&event);
 
-    // W- selected_option = (selected_option - 1 + MENU_TOTAL) % MENU_TOTAL on menu total és la posició final del menú
-    // S- selected_option = (selected_option + 1) % MENU_TOTAL
-    /*while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_KEYDOWN) {
-
-        }
-    }*/
-    /*
-    switch (event.keysym.sym)
-    {
-    case SDL_SCANCODE_W:
-    case SDL_SCANCODE_UP:
-        std::cout << "UP!!";
-        break;
-    case SDL_SCANCODE_S:
-    case SDL_SCANCODE_DOWN:
-        std::cout << "DOWN!!";
-        break;
-    case SDL_SCANCODE_X:
-    case SDL_SCANCODE_Z:
-        instance->audio->Play("sounds/coin.wav");
-        instance->setStage(PLAY_STAGE);
-        break;
-    default:
-        break;
-    }
-    */
-    // W- selected_option = (selected_option - 1 + MENU_TOTAL) % MENU_TOTAL on menu total és la posició final del menú
-    // S- selected_option = (selected_option + 1) % MENU_TOTAL
-    /*
-    if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP) || Input::gamepads[0].isButtonPressed(PAD_UP)) {
-        std::cout << "UP";
-        selected_option = (selected_option - 1 + MENU_TOTAL) % MENU_TOTAL;
-        if (selected_option == MENU_START) { std::cout << "start"; }
-        else if (selected_option == MENU_EXIT) { std::cout << "exit"; }
-    }
-    else if (Input::isKeyPressed(SDL_SCANCODE_S) || Input::isKeyPressed(SDL_SCANCODE_DOWN) || Input::gamepads[0].isButtonPressed(PAD_DOWN)) {
-        selected_option = (selected_option + 1) % MENU_TOTAL;
-        if (selected_option == MENU_START) { std::cout << "start"; }
-        else if (selected_option == MENU_EXIT) { std::cout << "exit"; }
-    }
-    else if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON))) && selected_option == MENU_START) {
-        instance->audio->Play("sounds/coin.wav");
-        instance->setStage(PLAY_STAGE);
-    }
-    else if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON))) && selected_option == MENU_EXIT) {
-        instance->audio->Play("sounds/coin.wav");
-        instance->must_exit = true;
-    }
-    */
-
-    // ANTIC
-    /*
-    if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
-        instance->audio->Play("sounds/coin.wav");
-        instance->setStage(PLAY_STAGE, MAIN_MENU);
-    }
-    */
-
-    /* -------------- AIXÒ ÉS NOU --------------*/
     //update del start button i exit button
     start_button->update(seconds_elapsed);
     exit_button->update(seconds_elapsed);
 }
 
-/*----------------Això és nou----------------*/
-//metodes dels stages que ens falten, el de lore i el tutorial i el del final del nivell.
 TutorialStage::TutorialStage() {
     //BACKGROUND
     Texture* cube_texture = new Texture();
@@ -613,12 +531,6 @@ void TutorialStage::render(Camera* camera) {
 
 void TutorialStage::update(double seconds_elapsed, Camera* camera) {
     Game* instance = Game::instance;
-    /*
-    if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
-        instance->audio->Play("sounds/coin.wav");
-        instance->setStage(PLAY_STAGE, TUTORIAL_STAGE);
-    }
-    */
 
     if (Input::isKeyPressed(SDL_SCANCODE_S)) { block = 7; }
     if (Input::isKeyPressed(SDL_SCANCODE_Z) && zWasPressed == false) { block++; }
@@ -635,9 +547,7 @@ PlayStage::PlayStage() {
 
     Game* instance = Game::instance;
 
-    /*----------------Això és nou----------------*/
     //Bàsicament es crean totes els EntityUI que utilitza el Play Stage copia tot el que hi ha a partir d'aquí
-
     Vector2 position_a;
     Vector2 size;
     Material material_a;
@@ -712,7 +622,6 @@ PlayStage::PlayStage() {
 }
 
 void PlayStage::render(Camera* camera) {
-    /* -------------- AIXÒ ÉS NOU --------------*/
     //Instanciar la camara i el joc
     Game* instance = Game::instance;
     Camera* camera2d = instance->camera2d;
@@ -756,19 +665,13 @@ void PlayStage::render(Camera* camera) {
 
         glEnable(GL_BLEND);
 
-        /* -------------- AIXÒ ÉS NOU --------------*/
         //render de cada EntityUI que hem creat al constructor
         player->health_bar->render(camera2d);
         player->turbo_bar->render(camera2d);
         healthbar_background->render(camera2d);
         level_indicator_bg->render(camera2d);
         turbo_indicator_bg->render(camera2d);
-        //turbo_bg->render(camera2d);
 
-        //turbo_indicator->render(camera2d);
-        //level_indicator->render(camera2d);
-
-        /*----------------Això és nou----------------*/
         //is està pausat el joc, renderitza els botons del menú de pausa
         if (instance->isPaused) {
             //renderitzes el menú de pause
@@ -782,18 +685,11 @@ void PlayStage::render(Camera* camera) {
             drawText((instance->window_width / 2) - 55, (instance->window_height - 217), "EXIT", text_color, 5);
         }
 
-        /*----------------Això és nou----------------*/
-        //he provat a renderitzar un comptador per lo de la distància fins al final del nivell, de moment no funciona
-        /*
-        std::string t = std::to_string(instance->elapsed_time);
-        drawText(instance->window_width / 2, instance->window_height / 2, t, Vector3(1.0), 10);*/
-
         glEnable(GL_DEPTH_TEST);
     }
 }
 
 void PlayStage::update(double seconds_elapsed, Camera* camera) {
-    /*----------------Això és nou----------------*/
     //instancies de game i player
     Game* instance = Game::instance;
     Player* player = Player::getInstance();
@@ -810,13 +706,10 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
     vignette_intensity = lerp(vignette_intensity, target_vignette, speed);
 
 
-
-    /*----------------Això és nou----------------*/
     //si cliques P, s'activa la bandera del menú de pausa
     if (Input::isKeyPressed(SDL_SCANCODE_P) && pWasPressed == false) { instance->isPaused = !instance->isPaused; }
 
     if (world) {
-        /*----------------Això és nou----------------*/
         //si està pausat, deixem d'actualitzar el mon i es deixa de moure el joc
         //si està pausat, actualitzem també els botons del menu de pausa
         if (!instance->isPaused) {
@@ -827,38 +720,19 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
             exit_button->update(seconds_elapsed);
         }
 
-        /* -------------- AIXÒ ÉS NOU --------------*/
         //update de les entities de player
         player->health_bar->update(seconds_elapsed);
         //healthbar_background->update(seconds_elapsed);
         player->turbo_bar->update(seconds_elapsed);
 
-        //turbo_indicator->update(seconds_elapsed);
-        //level_indicator->update(seconds_elapsed);
-        /*
-        std::string t = std::to_string(seconds_elapsed);
-        drawText(instance->window_width / 2, instance->window_height / 2, t, Vector3(1.0), 10);*/
     }
-    //Player* player = Player::getInstance();
 
-    /*----------------Això és nou----------------*/
-    //sense això, no funciona laopció de pausa
+    //sense això, no funciona la opció de pausa
     pWasPressed = Input::isKeyPressed(SDL_SCANCODE_P);
 }
 
 EndStage::EndStage() {
     Game* instance = Game::instance;
-    /*
-    // Imatge que ocupa tota la pantalla
-    Vector2 position = Vector2(instance->window_width * 0.5f, instance->window_height * 0.5f);
-    Vector2 size = Vector2(instance->window_width, instance->window_height);
-
-    Material mat;
-    mat.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-    mat.diffuse = Texture::Get("data/endpic.png");  
-
-    end_screen = new EntityUI(position, size, mat, eUIButtonID::UI_BACKGROUND);
-    */
 
     //BACKGROUND
     Texture* cube_texture = new Texture();
@@ -920,22 +794,6 @@ void EndStage::render(Camera* camera) {
     Player* player = Player::instance;
     Camera* cam2d = Game::instance->camera2d;
 
-    /*
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    // Fons negre (per si la imatge té transparència)
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // La teva imatge a pantalla completa
-    if (end_screen) {
-        end_screen->render(cam2d);
-    }
-
-    glEnable(GL_DEPTH_TEST);
-    */
-
     if (skybox) {
         skybox->model.setTranslation(camera->eye);
 
@@ -950,7 +808,6 @@ void EndStage::render(Camera* camera) {
     else {
         title2_1->render(cam2d);
         title2_2->render(cam2d);
-        //results->render(cam2d);
 
         std::string score = std::to_string(player->coins_collected);
         drawText(instance->window_width / 2 - 155, instance->window_height / 2, "Score:", Vector3(1.0), 5);
@@ -961,12 +818,7 @@ void EndStage::render(Camera* camera) {
 void EndStage::update(double seconds_elapsed, Camera* camera) {
     Game* instance = Game::instance;
     Player* player = Player::instance;
-    /*
-    if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
-        instance->audio->Play("sounds/coin.wav");
-        instance->setStage(MAIN_MENU, END_STAGE);
-    }
-    */
+
     if (player->turbo) {
         zWasPressed = true;
         player->turbo = false;

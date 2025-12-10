@@ -25,6 +25,8 @@ asdasd
 
     Developed the procedural generation system to spawn the level segments. Created different difficulty patterns, so it gets more difficult while you are playing (Soft Rain->Wall->Rain->Sinusoide->End planet animation).Implemented the logic for spawning, moving, and cleaning up asteorids and rings.
 
+USE OF AI: Used AI for the function generateChunk(), used to know how to make all the different types of patterns for the level. Used to make the general structure of ChunkGenerator. Used for the final planet animation to connect ChunkGenerator with World.
+
 **Combat System**
 	Author: Andrea
 	Files: projectile.h/cpp
@@ -47,6 +49,8 @@ asdasd
 		->Explosions: Burst effect when asteroids are destroyed.
 		->Engine Trail: Continues fire effect behind the player.
 		->Damage Smoke: Smoke Trail when asteroids are destroyed.
+
+USE OF AI: Used to know which parameters to set to generate certain colors and effects. Used for the position of the damage smoke behind the spaceship. Mix between class code and slides and AI.
 
 
 **Post-processing Shaders**

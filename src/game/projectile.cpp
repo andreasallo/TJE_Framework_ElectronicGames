@@ -42,7 +42,7 @@ void Projectile::update(float dt)
         return;
     }
 
-    auto& asteroids = World::instance->asteroidControl.asteroids;
+    std::vector<Asteroid*>& asteroids = World::instance->asteroidControl.asteroids;
 
     for (Asteroid* a : asteroids)
     {

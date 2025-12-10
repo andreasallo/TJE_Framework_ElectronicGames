@@ -345,7 +345,7 @@ void World::update(float delta_time)
 
 
 	//Limpieza de entidades
-	for (auto e : entities_to_destroy)
+	for (Entity* e : entities_to_destroy)
 	{
 		if (e->parent) e->parent->removeChild(e);
 		delete e;

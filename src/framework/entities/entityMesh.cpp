@@ -36,7 +36,7 @@ void EntityMesh::render(Camera* camera) {
     //Instancing 
     //CULLING INSTANCED MESHES
     if (isInstanced) { //si true vol dir que hi ha molts objectes, itera per totes les matrius models
-        for (const auto& model_matrix : models) {
+        for (const Matrix44& model_matrix : models) {
 
             //Bounding box in world space
             BoundingBox box = transformBoundingBox(model_matrix, mesh->box);

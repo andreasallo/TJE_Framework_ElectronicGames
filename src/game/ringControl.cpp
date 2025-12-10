@@ -38,7 +38,7 @@ void RingControl::update(float dt)
             Vector3 rc = r->model.getTranslation();
             float dist = pc.distance(rc);
 
-            if (dist < r->collision_radius - player->collision_radius) {
+			if (dist < r->collision_radius - player->collision_radius) { //col·lisió. NO UTILITZEM LA FUNCIO D SPHERE COLLISION PERQUÈ VOLEM UNA DISTÀNCIA MENYS RESTRICTIVA. HA DE DETECTAR EL CENTRE DEL RING I NO LA ESFERA COMPLETA.
                 r->toDelete = true;
                 World::instance->destroyEntity(r);  
 

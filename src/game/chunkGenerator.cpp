@@ -9,8 +9,8 @@ void ChunkGenerator::init(float safeZone, float chunkLen, float totalLen) {
     safeZoneInitial = safeZone;
     chunkLength = chunkLen;
     totalLevelLength = totalLen;
-    rng.seed(42); 
-    dist = std::uniform_real_distribution<float>(0.0f, 1.0f);
+	rng.seed(42); //semilla fixa per reproducibilitat (he ficat 42 pero pot ser qualsevol num), la secuencia de chunks serà sempre la mateixa
+	dist = std::uniform_real_distribution<float>(0.0f, 1.0f);//rang 0-1. agafem qualsevol num aleatori i el transformem a aquest rang, aixi es mes facil escalar-lo després
     nextChunkZ = safeZoneInitial;
 }
 
@@ -79,7 +79,7 @@ void ChunkGenerator::generateChunk(float baseZ) {
         }
     }
     else if (progress < 0.95f) { // 80-95%: Onades/zigzag (nou, no graella)
-        std::cout << "  Patró: Onades zigzag" << std::endl;
+        std::cout << "  Patró: zigzag" << std::endl;
         float startZ = baseZ + 0.2f * chunkLength;
         float gapX = -5.0f + frand() * 10.0f;
 
@@ -89,7 +89,7 @@ void ChunkGenerator::generateChunk(float baseZ) {
             float offsetX = sin(waveZ * 0.1f) * 8.0f; // Moviment sinuós
             for (int i = 0; i < 8; ++i) {
                 float x = -12.0f + (i / 7.0f) * 24.0f + offsetX;
-                if (fabsf(x - gapX) < 5.0f) continue; 
+				if (fabsf(x - gapX) < 5.0f) continue;  //fabsf es per valor absolut de float, evitar problemes amb negatius
                 float y = 6.0f + cos(waveZ * 0.1f + i * 0.5f) * 8.0f; 
                 ast.spawnAsteroidAt(x, y, waveZ, speedMax * 1.6f);
             }
@@ -111,7 +111,7 @@ void ChunkGenerator::generateChunk(float baseZ) {
             World::instance->end_planet->model.setTranslation(0.0f, 0.0f, startZ);
             World::instance->end_planet->model.scale(4.0f, 4.0f, 4.0f); // petit al fons
 
-            std::cout << "--- PLANETA INICIAT LLUNY (Z = " << startZ << ") ---" << std::endl;
+            std::cout << "--- PLANETA INICIAT (Z = " << startZ << ") ---" << std::endl;
         }
     }
 }

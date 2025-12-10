@@ -30,11 +30,12 @@ void Projectile::init(const Vector3& origin, const Vector3& dir)
 void Projectile::update(float dt)
 {
     if (toDelete) return;
-
+    //moviment cap a +z
     Vector3 pos = model.getTranslation();
     pos = pos + direction * speed * dt;
     model.setTranslation(pos);
 
+    //bales d no molta longitud
     lifeTime -= dt;
     if (lifeTime <= 0.0f)
     {

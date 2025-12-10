@@ -1,0 +1,1 @@
+Before you Play: Press 'Z' on your keyboad to advance after the menu. You can also Press 'S' to skip to the tutorial screen. While in the Play stage, press the 'P' key to open the Pause Menu.

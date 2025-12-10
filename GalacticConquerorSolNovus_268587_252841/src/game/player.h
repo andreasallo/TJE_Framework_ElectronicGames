@@ -1,0 +1,96 @@
+#pragma once
+
+#include "framework/entities/entityMesh.h"
+#include "framework/entities/entityCollider.h"
+#include "game/asteroid.h"
+#include "game/asteroidControl.h"
+
+//hereda de EntityMesh
+
+//hago singleton-> todo static, pero solo lo pongo en la instancia
+
+class Mesh;
+class Material;
+class Camera;
+
+class EntityUI;
+
+class Player : public EntityCollider {
+private:
+
+
+	bool render_mesh = true;
+	Vector3 velocity = Vector3(0.0f);
+
+
+	float speed = 0.0f;          // Velocidad actual
+	float targetSpeed = 0.0f;    // Velocidad a la que queremos llegar
+	float acceleration = 40.0f;  // Qué tan rápido acelera
+	float rotation_speed = 1.5f; // Velocidad de giro
+	
+
+	
+	float visualPitch = 0.0f;
+	float visualRoll = 0.0f;
+
+
+	const Vector3& getMovementDirection();
+
+
+public:
+	static Player* instance;
+	Player() {};
+	Player(Mesh* mesh, const Material& material, const std::string& name = "");
+
+	static Player* getInstance() { return instance; }
+
+
+	void render(Camera* camera) override;
+	void update(float delta_time) override;
+
+	Vector3 position;
+
+	//float sphere_radius = 0.8f;
+	//float height = 0.6f;
+
+	float lateralSpeed = 8.0f;
+	float forwardSpeed = 0.0f;  // velocitat constant cap endavant
+	bool isDestroyed = false;
+
+	int lives = 3;
+	int previous_lives = 3;
+
+	//max_lives
+	float max_lives = 3.0f;
+	float collision_radius;
+
+	//regeneration countdown
+	float time_to_heal = 3.0f;
+
+	// Límits del túnel
+	float minX = -12.0f, maxX = 12.0f;
+	float minY = 0.0f, maxY = 24.0f;
+	float limit_sound_timer = 0.0f;
+
+	//TURBO VARIABLES
+	bool turbo = false;
+	float turbo_timer = 0.0f;
+	int coins_collected = 0;
+	float turbo_duration = 3.0f; // Duración del turbo en segundos
+
+
+	/* -------------- AIXÒ ÉS NOU --------------*/
+	//Entities de la HUD del play stage, les que s'actualitzen
+	EntityUI* turbo_bar = nullptr;
+	EntityUI* health_bar = nullptr;
+
+	bool canShoot() const;
+	void SetRenderMesh(bool new_render_mesh) { render_mesh = new_render_mesh; }
+	bool canMove(const Vector3& new_position);
+	void collison(Vector3& position);
+	void handleImpact(Asteroid* asteroid);
+	//void isGrounded(const Vector3& new_position, float max_ray_dist, Vector3& col_point);
+
+	Vector3 getCollisionCenter() const { return model.getTranslation(); }
+
+};

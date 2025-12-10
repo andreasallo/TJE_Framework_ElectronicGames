@@ -116,12 +116,12 @@ World::World() {
 		// comença petit → creix → es redueix
 
 		smoke_emitter->setColorsCurve({
-	Vector4(0.6f, 0.6f, 0.6f, 0.0f),  // Gris medio, bastante visible al inicio
-	Vector4(0.5f, 0.5f, 0.5f, 0.15f),  // Se oscurece (se enfría)
+	Vector4(0.6f, 0.6f, 0.6f, 0.0f),  // Gris medio,
+	Vector4(0.5f, 0.5f, 0.5f, 0.15f),  // Se oscurece 
 	Vector4(0.0f, 0.0f, 0.0f, 0.0f)   // Negro transparente al final
 			});
 
-		// IMPORTANT: afegir al render de transparències
+		//IMPORTANT: afegir al render de transparències
 		transparent_entities.push_back(smoke_emitter);
 
 		root->addChild(smoke_emitter);

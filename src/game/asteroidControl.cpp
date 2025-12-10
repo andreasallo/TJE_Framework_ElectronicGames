@@ -14,14 +14,17 @@ void AsteroidControl::init() {
     asteroidMesh = Mesh::Get("data/meteorito.obj");
     asteroidMat.diffuse = Texture::Get("data/StoneFloorTexture.png");
     asteroidMat.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
-    spawnTimer = 0.0f;  
+ 
 }
 
 void AsteroidControl::update(float dt)
 {
     Player* player = World::instance->player;
+
+    //ACCELERAR TOT EL MON AMB TURBO, OJO
     float worldSpeedFactor = (player && player->turbo) ? 2.0f : 1.0f;
 
+    //movement
     for (Asteroid* a : asteroids) {
         if (!a || a->toDelete) continue;
         float originalSpeed = a->speed;
@@ -30,7 +33,7 @@ void AsteroidControl::update(float dt)
         a->speed = originalSpeed;
     }
 
-
+    //colisions
     if (player) {
         for (Asteroid* a : asteroids) {
             if (!a || a->toDelete) continue;
@@ -70,6 +73,7 @@ void AsteroidControl::update(float dt)
     );
 }
 
+//Aquesta funcio s'utilitza a chunkGenerator per spawnar meteorits a posicions concretes
 void AsteroidControl::spawnAsteroidAt(float x, float y, float z, float speed) {
     Asteroid* a = new Asteroid(asteroidMesh, asteroidMat, "asteroid");
     a->model.setTranslation(x, y, z);

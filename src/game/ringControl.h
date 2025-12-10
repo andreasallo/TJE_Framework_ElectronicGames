@@ -10,7 +10,6 @@ public:
     std::vector<Ring*> rings;
 
     float spawnInterval = 3.5f; //cada quant apareix un arc
-    float spawnTimer = 0.0f;
 
 
     Mesh* ringMesh = nullptr;

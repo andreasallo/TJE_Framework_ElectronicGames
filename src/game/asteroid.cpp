@@ -19,7 +19,7 @@ void Asteroid::update(float dt)
     //els meteorits es mouen cap al jugador → direcció -Z
     model.translate(0, 0, -speed * dt);
 
-    //si passen del jugador → destruir
+    //si passen del jugador per derrere → destruir (el 150 es pk amb un numero mes petit desapareixen quan encara estan en la visio d la camara)
     if (model.getTranslation().z < World::instance->player->model.getTranslation().z - 150.0f) {
      
         toDelete = true;

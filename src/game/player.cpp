@@ -103,6 +103,7 @@ void Player::render(Camera* camera)
 
 
    
+//alfinal NOT USED
 const Vector3& Player::getMovementDirection() {
 
     // Calcular direcci� de moviment segons c�mera
@@ -168,7 +169,7 @@ void Player::update(float dt)
     position.x = clamp(position.x, minX, maxX);
     position.y = clamp(position.y, minY, maxY);
 
-    float forwardSpeed = turbo ? 80.0f : 40.0f;
+    float forwardSpeed = turbo ? 80.0f : 40.0f; //turbo->doble velocitat
     position.z += forwardSpeed * dt;
 
     //ROTACIÓ VISUAL 
@@ -180,7 +181,7 @@ void Player::update(float dt)
 
     float k = explerpFactor(dt, 12.0f); //6.0????
 
-    visualRoll = lerp(visualRoll, desiredRoll, k);
+    visualRoll = lerp(visualRoll, desiredRoll, k); //lerp per suavitza la transicio, el valor k l'he anat provant
     visualPitch = lerp(visualPitch, desiredPitch, k);
 
 
@@ -234,7 +235,7 @@ void Player::update(float dt)
         World::instance->requestShoot();
     }
 
-    // --- ENGINE FIRE POSITION ---
+    //ENGINE FIRE POSITION
     {
         // posició del motor (lleugerament darrere la nau)
         Vector3 planePos = model.getTranslation();

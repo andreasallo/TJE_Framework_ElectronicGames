@@ -11,11 +11,11 @@ void ChunkGenerator::init(float safeZone, float chunkLen, float totalLen) {
     totalLevelLength = totalLen;
 	rng.seed(42); //semilla fixa per reproducibilitat (he ficat 42 pero pot ser qualsevol num), la secuencia de chunks serà sempre la mateixa
 	dist = std::uniform_real_distribution<float>(0.0f, 1.0f);//rang 0-1. agafem qualsevol num aleatori i el transformem a aquest rang, aixi es mes facil escalar-lo després
-    nextChunkZ = safeZoneInitial;
+	nextChunkZ = safeZoneInitial; //generem despres de la zona segura, es per evitar que apareguin asteroides a sobre del jugador al iniciar
 }
 
 void ChunkGenerator::update(float dt, float playerZ) {
-    float lookahead = 1200.0f; // Ajustat per generar abans i evitar buits
+    float lookahead = 1200.0f; //Ajustat per generar abans i evitar buits. AIXI TMB GENERES MES CHUNKS Q NO NOMES L'ACTUAL, SINO ELS METEORITOS ET MENJEN.
     float targetZ = playerZ + lookahead;
     while (nextChunkZ < targetZ && nextChunkZ < totalLevelLength) {
         generateChunk(nextChunkZ);
@@ -24,12 +24,14 @@ void ChunkGenerator::update(float dt, float playerZ) {
 }
 
 void ChunkGenerator::generateChunk(float baseZ) {
+    //% del process completat 
     float progress = (baseZ - safeZoneInitial) / (totalLevelLength - safeZoneInitial);
 
     AsteroidControl& ast = World::instance->asteroidControl;
     RingControl& ring = World::instance->ringControl;
 
-    float speedMin = 18.0f + progress * 10.0f;   //MOLT MÉS BAIXA al principi
+	//augmentar dificultat, no nomes amb els patrons sino amb la velocitat
+    float speedMin = 18.0f + progress * 10.0f;   //MOLT MÉS BAIXA al principi ( es veia mas rapid tot)
     float speedMax = 30.0f + progress * 30.0f;
 
     //debug
@@ -78,7 +80,7 @@ void ChunkGenerator::generateChunk(float baseZ) {
             ring.spawnRingAt(rx, ry, baseZ + 0.8f * chunkLength, speedMax * (1.0f + frand() * 0.3f));
         }
     }
-    else if (progress < 0.95f) { // 80-95%: Onades/zigzag (nou, no graella)
+    else if (progress < 0.95f) { // 80-95%: Onades/zigzag 
         std::cout << "  Patró: zigzag" << std::endl;
         float startZ = baseZ + 0.2f * chunkLength;
         float gapX = -5.0f + frand() * 10.0f;
@@ -102,7 +104,7 @@ void ChunkGenerator::generateChunk(float baseZ) {
             World::instance->final_sequence_timer = 0.0f;
             World::instance->final_collided = false;
 
-            float startZ = totalLevelLength + 900.0f; // desde on començo a veurel, si vull q aparegui quan encara etic mes lluny fico un numero mes gran.
+            float startZ = totalLevelLength + 900.0f; // desde on començo a veurel, si vull q aparegui quan encara estic mes lluny fico un numero mes gran.
 
             //Guardem la posició inicial perquè l'animació la faci World cada frame
             World::instance->planet_initial_z = startZ;

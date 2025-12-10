@@ -11,11 +11,12 @@
 
 
 void RingControl::init() {
+
+	//Es una mesh sense textura, fiquem textura blanca i pintem el ring de groc.
     ringMesh = Mesh::Get("data/final_ring.obj");
     ringMaterial.shader = Shader::Get("data/shaders/basic.vs", "data/shaders/texture.fs");
     ringMaterial.diffuse = Texture::Get("data/01tizeta_floor_e.png");
     ringMaterial.color = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
-    spawnTimer = 0.0f;
 }
 
 void RingControl::update(float dt)
@@ -38,7 +39,9 @@ void RingControl::update(float dt)
             Vector3 rc = r->model.getTranslation();
             float dist = pc.distance(rc);
 
-			if (dist < r->collision_radius - player->collision_radius) { //col·lisió. NO UTILITZEM LA FUNCIO D SPHERE COLLISION PERQUÈ VOLEM UNA DISTÀNCIA MENYS RESTRICTIVA. HA DE DETECTAR EL CENTRE DEL RING I NO LA ESFERA COMPLETA.
+            //NO UTILITZAR TESTENTITYSPHERE
+            //Amb aquella funcio detectava tmb el lateral del ring, no te sentit amb el nostre joc.
+			if (dist < r->collision_radius - player->collision_radius) { //volem q detecti com el centre del ring
                 r->toDelete = true;
                 World::instance->destroyEntity(r);  
 

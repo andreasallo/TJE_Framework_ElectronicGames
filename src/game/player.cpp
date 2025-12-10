@@ -1,14 +1,4 @@
 ﻿
-//front=nYaw.frontVector;
-//right=-nYaw.rightVector;
-
-//collisions
-//model.setTranslation(position);
-// model.rotate() //cojer yaw anteriror, cojer delta y acumular dt
-//EntityMesh::update(delta_time);
-
-//exponential interpolation frmae-rate; usar lerp
-//foto: eye center eye center
 #include "player.h"
 #include "framework/input.h"
 #include "framework/camera.h"
@@ -133,40 +123,20 @@ const Vector3& Player::getMovementDirection() {
 
 
 
-/*
-void Player::collison(Vector3& position) {
-    // Get sphere center from character position
-    Vector3 character_center = position + Vector3(0, 1, 0);    
-    World* world = World::getInstance();
-
-    for (EntityMesh* e : world->root->children) {
-        Mesh* mesh =
-        // Check if collides with wall using sphere (radius = 1)
-        if (mesh->testSphereCollision(entity->model, character_center, 1.0, col_point, col_normal)) {
-            std::cout << �Collision!� << std::endl;
-        }
-    }
-}
-*/
-
    
 
 void Player::update(float dt)
 {
     /* -------------- AIXÒ ÉS NOU --------------*/
     Game* instance = Game::instance;
-    /* -------------- AIXÒ ÉS NOU --------------*/
-    //mentre no presiones Z, el turbo està desactivat
+
     turbo = false;
     float x = 0, y = 0;
     if (Input::isKeyPressed(SDL_SCANCODE_A) || Input::isKeyPressed(SDL_SCANCODE_LEFT))  x += 1.0f;
     if (Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_RIGHT)) x -= 1.0f;
     if (Input::isKeyPressed(SDL_SCANCODE_W) || Input::isKeyPressed(SDL_SCANCODE_UP))    y -= 1.0f;
     if (Input::isKeyPressed(SDL_SCANCODE_F) || Input::isKeyPressed(SDL_SCANCODE_DOWN))  y += 1.0f;
-    /* -------------- AIXÒ ÉS NOU --------------*/
-    //mentre presiones Z, tens el turbo activat
-    //if (Input::isKeyPressed(SDL_SCANCODE_Z)) turbo = true;
-    //if (Input::isKeyPressed(SDL_SCANCODE_P)) instance->isPaused = true;
+
 
     Vector3 move(x, y, 0);
     if (move.length() > 0.001f) {
@@ -176,6 +146,23 @@ void Player::update(float dt)
     //MOVIMENT LATERAL
     position.x += move.x * lateralSpeed * dt;
     position.y += move.y * lateralSpeed * dt;
+
+	//AVISAR JUGADOR SI TOCA ELS LÍMITS
+    if (limit_sound_timer > 0.0f) {
+        limit_sound_timer -= dt;
+    }
+    bool hit_limit = false;
+    if (position.x < minX || position.x > maxX) {
+        hit_limit = true;
+    }
+    if (position.y < minY || position.y > maxY) {
+        hit_limit = true;
+    }
+    if (hit_limit && limit_sound_timer <= 0.0f) {
+ 
+        Audio::Play("data/pip.wav", 0.8f, BASS_SAMPLE_MONO);
+        limit_sound_timer = 0.5f;
+    }
 
     //limitar pantalla
     position.x = clamp(position.x, minX, maxX);
@@ -220,25 +207,11 @@ void Player::update(float dt)
     previous_lives = lives;
 
     //turbo
-    /*
-    if (turbo)
-    {
-        turbo_timer -= dt;
-        //actualitza la mask de la barra de turbo mentre està activat el turbo
-        turbo_bar->mask -= dt / turbo_duration;
-
-        if (turbo_timer <= 0.0f)
-        {
-            turbo = false;
-            std::cout << "Turbo OFF" << std::endl;
-        }
-    }*/
-
-    //turbo
     bool trying_to_turbo = Input::isKeyPressed(SDL_SCANCODE_Z);
 
     if (trying_to_turbo && turbo_timer > 0.0f) {
         turbo = true;
+        Audio::Play("data/turbo.wav", 2.0f, BASS_SAMPLE_MONO);
         turbo_timer -= dt;
     }
     else {
@@ -266,8 +239,6 @@ void Player::update(float dt)
         // posició del motor (lleugerament darrere la nau)
         Vector3 planePos = model.getTranslation();
         Vector3 back = model.frontVector().normalize() * -1.0f;
-
-        // Ajustos per col·locar el foc
         Vector3 enginePos =
             planePos
             + back * 2.5f   // separació en Z
@@ -293,52 +264,5 @@ void Player::update(float dt)
     EntityCollider::update(dt);
 }
 
-/*
-void Player::handleImpact(Asteroid* asteroid)
-{
-
-    World* world = World::instance;
-
-    if (lives > 0)
-    {
-        lives--;
-        std::cout << "¡IMPACTO! Vidas restantes: " << lives << std::endl;
-
-        //Destruir el meteorit
-        World::getInstance()->destroyEntity(asteroid);
-        asteroid->toDelete = true; //AsteroidControl CONTROLA TOTA LA NETEJA
-       
-
-        if (lives <= 0) //DEAD
-        {
-            std::cout << "GAME OVER" << std::endl;
-            //World::instance->gameOver();
-        }
-    }
-}
-*/
 
 
-
-
-/*bool Player::canMove(const Vector3& new_position) {
-
-    std::vector<sCollisionData> collisions;
-    World* world = World::getInstance();
-
-    int collision_filter = eCollisionFilter::ENEMY;
-
-    for (Entity* e : world->root->children) {
-        if (e != this && Collision::TestEntitySphere(e, sphere_radius, new_position + Vector3(0.0f, height, 0.0f), collisions, eCollisionFilter::SCENARIO)) {
-            Asteroid* asteroid = dynamic_cast<Asteroid*>(e);
-            if (asteroid) {
-                // Llama a la lógica de impacto que resta vidas y destruye el asteroide.
-                handleImpact(asteroid);
-            }
-        }
-    }
-    return true;
-}*/
-
-//collided |=collision:testEntitySphere(e,sphere_radius,new_position+Vector3(0.0f,height, 0.0f), collisions, eCollisionFilter::SCENARIO);
-//return !collided

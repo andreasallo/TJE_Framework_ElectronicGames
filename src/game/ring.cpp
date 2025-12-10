@@ -49,7 +49,7 @@ void Ring::update(float dt)
     model.translate(0, 0, -current_speed * dt);
 
     // Lógica para borrar si el anillo ha pasado al jugador.
-    if (model.getTranslation().z < -20.0f) { // Ajusta el límite de Z si es necesario
+    if (model.getTranslation().z < -20.0f) { 
         toDelete = true;
     }
     EntityCollider::update(dt);

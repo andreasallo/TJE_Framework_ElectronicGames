@@ -70,6 +70,7 @@ public:
 	// Límits del túnel
 	float minX = -12.0f, maxX = 12.0f;
 	float minY = 0.0f, maxY = 24.0f;
+	float limit_sound_timer = 0.0f;
 
 	//TURBO VARIABLES
 	bool turbo = false;
@@ -90,9 +91,6 @@ public:
 	void handleImpact(Asteroid* asteroid);
 	//void isGrounded(const Vector3& new_position, float max_ray_dist, Vector3& col_point);
 
-	//for(Entity* e: world->root->children){
-
-	// retorna centre global per col·lisions (usa el del EntityCollider)
 	Vector3 getCollisionCenter() const { return model.getTranslation(); }
 
 };

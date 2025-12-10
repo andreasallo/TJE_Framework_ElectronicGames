@@ -35,6 +35,3 @@ public:
 
 };
 
-// El 'if (entity->layer & SCENARIO)' que tenías
-// debe ir DENTRO de una función que haga colisiones,
-// por ejemplo, en player.cpp::canMove

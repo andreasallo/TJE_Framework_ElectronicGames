@@ -21,8 +21,6 @@
 
 #include <random>
 
-
-// ----------------- Constructor (World::World) -----------------
 World::World() {
 	instance = this;
 	Audio::Init();
@@ -86,30 +84,30 @@ World::World() {
 	{
 		//fire
 		explosion_emitter = new ParticleEmitter();
-		explosion_emitter->setTexture("data/fire.png"); // exemple
-		explosion_emitter->setTextureGridSize(4);        // si la textura és 4x4
+		explosion_emitter->setTexture("data/fire.png");
+		explosion_emitter->setTextureGridSize(4);        
 		explosion_emitter->setAdditiveBlendingEnabled(true);
-		explosion_emitter->setEmissionEnabled(false);    // només quan hi hagi explosió
+		explosion_emitter->setEmissionEnabled(false);    
 		explosion_emitter->setEmitRate(0.001f);
 		explosion_emitter->setMaxTimeAlive(0.6f);
 		explosion_emitter->setRandomFactor(0.8f);
 		explosion_emitter->setSizesCurve({ 3.5f, 2.0f, 0.0f }); // creix i desapareix
 		explosion_emitter->setColorsCurve({
-	Vector4(1.0f, 1.0f, 0.8f, 1.0f), // Inicio: Muy caliente (casi blanco)
+	Vector4(1.0f, 1.0f, 0.8f, 1.0f), // Inicio: (casi blanco)
 	Vector4(1.0f, 0.4f, 0.0f, 0.8f), // Medio: Fuego naranja
 	Vector4(0.2f, 0.2f, 0.2f, 0.0f)  // Final: Se desvanece
 			});
 
 		transparent_entities.push_back(explosion_emitter);
-		root->addChild(explosion_emitter);   // perquè es renderitzi
+		root->addChild(explosion_emitter);   
 
 
 		//SMOKE
 		smoke_emitter = new ParticleEmitter();
-		smoke_emitter->setTexture("data/smoke.png");   // usa la teva textura de fum
-		smoke_emitter->setTextureGridSize(2);        // 2x2 frames
+		smoke_emitter->setTexture("data/smoke.png");  
+		smoke_emitter->setTextureGridSize(2);       
 		smoke_emitter->setEmissionEnabled(false);
-		smoke_emitter->setAdditiveBlendingEnabled(false); // fum -> blending normal
+		smoke_emitter->setAdditiveBlendingEnabled(false); 
 		smoke_emitter->setEmitRate(0.01f);            // surt un núvol seguit però no molt dens
 		smoke_emitter->setMaxTimeAlive(1.7f);         // dura més que el foc
 		smoke_emitter->setRandomFactor(2.5f);         // lleugera dispersió
@@ -126,7 +124,6 @@ World::World() {
 		// IMPORTANT: afegir al render de transparències
 		transparent_entities.push_back(smoke_emitter);
 
-		// Afegir a l'escena
 		root->addChild(smoke_emitter);
 
 		//ENGINE FIRE
@@ -151,25 +148,6 @@ World::World() {
 		transparent_entities.push_back(engine_fire_emitter);
 		root->addChild(engine_fire_emitter);
 
-		// --- DAMAGE SMOKE (fum quan reps impacte) ---
-		damage_smoke_emitter = new ParticleEmitter();
-		damage_smoke_emitter->setTexture("data/particles/smoke_atlas.png");
-		damage_smoke_emitter->setTextureGridSize(2);
-		damage_smoke_emitter->setAdditiveBlendingEnabled(false); // fum normal
-		damage_smoke_emitter->setEmissionEnabled(false); // només en impacte
-		damage_smoke_emitter->setEmitRate(0.03f);
-		damage_smoke_emitter->setMaxTimeAlive(2.5f);
-		damage_smoke_emitter->setRandomFactor(0.4f);
-		damage_smoke_emitter->setSizesCurve({ 0.4f, 1.4f, 2.0f });
-		damage_smoke_emitter->setColorsCurve({
-			Vector4(0.3f, 0.3f, 0.3f, 0.7f),
-			Vector4(0.2f, 0.2f, 0.2f, 0.4f),
-			Vector4(0.1f, 0.1f, 0.1f, 0.0f)
-			});
-
-		// important: render transparent
-		transparent_entities.push_back(damage_smoke_emitter);
-		root->addChild(damage_smoke_emitter);
 
 	}
 }
@@ -201,9 +179,8 @@ void World::render(Camera* camera) {
 	player->render(camera);
 	root->render(camera);
 
-	drawGrid();
-	//Asteroid
-	//asteroid_root->render(camera);
+	//drawGrid();
+	
 	for (Entity* e : transparent_entities)
 	{
 		if (e)
@@ -261,7 +238,6 @@ void World::requestShoot()
 
 
 
-// ----------------- Update (World::update) -----------------
 void World::update(float delta_time)
 {
 
@@ -281,14 +257,14 @@ void World::update(float delta_time)
 
 		if (progress >= 0.95f)
 		{
-			player->turbo = false;                    // no hi ha turbo
+			player->turbo = false;                  
 			player->forwardSpeed = 5.0f;             // velocitat molt lenta
-			// Audio::Play("data/final_approach.wav", 0.6f); // opcional
+			Audio::Play("data/level-win-6416.wav", 0.6f); 
 		}
 	}
 
 	//logica normal
-	if (level_finished) {  // ← FIX: només quan finished
+	if (level_finished) {  
 		final_sequence_timer += delta_time;
 
 		float worldSpeedFactor = (player && player->turbo) ? 2.0f : 1.0f;
@@ -309,7 +285,6 @@ void World::update(float delta_time)
 
 		float planetBaseRadius = end_planet->mesh->box.halfsize.x;
 
-		// Multiplicamos por la escala actual para obtener el radio real en pantalla
 		float planetRealRadius = planetBaseRadius * currentScale * 0.95f;
 		float distance = end_planet->model.getTranslation().distance(player->model.getTranslation());
 
@@ -319,116 +294,25 @@ void World::update(float delta_time)
 			Game::instance->setStage(END_STAGE, PLAY_STAGE);
 		}
 	}
-		
-		/*
-		chunkGen.update(delta_time, player->model.getTranslation().z);
-		
 
-		
-		// Generar chunks
-		for (const sChunk& c : chunkGen.getChunks())
-		{
-			if (!hasSpawnedChunk(c.startZ))
-			{
-				for (const sAsteroidSpawn& a : c.asteroids)
-					asteroidControl.spawnAsteroidAt(a.x, a.y, a.z, a.speed);
-
-				for (const sRingSpawn& r : c.rings)
-					ringControl.spawnRingAt(r.x, r.y, r.z);
-
-				markChunkSpawned(c.startZ);
-			}
-		}
-
-		// DETECTAR EL FINAL DEL NIVEL
-		// Si el jugador supera la longitud del nivel
-		if (player->model.getTranslation().z >= chunkGen.levelLength)
-		{
-			level_finished = true;
-			final_sequence_timer = 0.0f; //animacio
-			final_collided = false;
-
-
-			//long + distncia inicial
-			float startZ = chunkGen.levelLength + 400.0f;
-
-			end_planet->model.setIdentity();
-			end_planet->model.setTranslation(0.0f, 0.0f, startZ);
-			end_planet->model.scale(10.0f, 10.0f, 10.0f); // Tamaño inicial visible
-
-			std::cout << "--- FINAL DEL NIVEL ALCANZADO ---" << std::endl;
-		}
-	}
-	// --- SECUENCIA FINAL (PLANETA ACERCÁNDOSE) ---
-	else
-	{
-		// Aumentamos el temporizador
-		final_sequence_timer += delta_time;
-
-		// PARÁMETROS DE LA ANIMACIÓN
-		float approachSpeed = 80.0f;  // Velocidad a la que se acerca el planeta (similar a meteoritos)
-		float growthSpeed = 30.0f;    // Cuánto crece por segundo
-		float rotationSpeed = 0.1f;   // Rotación lenta estética
-
-		// 1. Calcular dónde debería estar el planeta ahora
-		float startZ = chunkGen.levelLength;
-		float currentZ = startZ - (approachSpeed * final_sequence_timer);
-
-		//Calcular escala actual
-		float startScale = 10.0f;
-		float currentScale = startScale + (growthSpeed * final_sequence_timer);
-
-		// ONSTRUIR LA MATRIZ (Orden: T * R * S)
-		// Usamos una matriz limpia cada frame para evitar deformaciones
-		Matrix44 m;
-		m.setIdentity();
-		m.setTranslation(0.0f, 0.0f, currentZ); // Primero Traslación
-		m.rotate(final_sequence_timer * rotationSpeed, Vector3(0, 1, 0)); // Luego Rotación
-		m.scale(currentScale, currentScale, currentScale); // Finalmente Escala
-
-
-		end_planet->model = m;
-
-		// DETECTAR COLISIÓN FINAL
-
-		if (!final_collided && currentZ < player->model.getTranslation().z + 20.0f)
-		{
-			final_collided = true;
-			std::cout << "COLISION CON PLANETA. ENDSTAGE." << std::endl;
-		}
-	}*/
+	//PROJEECTILS CONTROL
 	
-
-	// --- GESTIÓN DE PROYECTILES (NUEVO SISTEMA) ---
-
-	// 1. Update de todos los proyectiles vivos
 	for (Projectile* p : projectiles) {
 		if (p && !p->toDelete) {
 			p->update(delta_time);
 		}
 	}
 
-	// 2. Usar remove_if para limpiar el vector y mandar a destruir las entidades
-	// 1. Update de proyectiles
-	for (Projectile* p : projectiles) {
-		if (p && !p->toDelete) {
-			p->update(delta_time);
-		}
-	}
-
-	// 2. Limpieza segura (Aquí es donde ocurre la magia para no crashear)
+	// NETEJA SEGURA, MOLT CUIDADO SINO CRUSH
 	auto iterator = std::remove_if(projectiles.begin(), projectiles.end(), [](Projectile* p) {
 		if (p->toDelete) {
-			// El World ve la bandera y dice: "Vale, hora de borrarte de verdad"
 			World::instance->destroyEntity(p);
-			return true; // Sácalo de la lista de proyectiles
+			return true; 
 		}
 		return false;
 		});
-	// Borramos del vector los que hemos sacado
 	projectiles.erase(iterator, projectiles.end());
 
-	//PROJECTILS
 	explosion_emitter->update(delta_time);
 
 	if (explosion_timer > 0.0f)
@@ -440,7 +324,6 @@ void World::update(float delta_time)
 
 	smoke_emitter->update(delta_time);
 	engine_fire_emitter->update(delta_time);
-
 
 	if (smoke_timer > 0.0f)
 	{
@@ -458,22 +341,10 @@ void World::update(float delta_time)
 			chromatic_aberration_timer = 0.0f;
 	}
 
-	if (damage_smoke_timer > 0.0f)
-	{
-		damage_smoke_timer -= delta_time;
-		damage_smoke_emitter->setEmissionEnabled(true);
-		if (player) {
-			damage_smoke_emitter->setEmitPosition(player->model.getTranslation());
-		}
-		if (damage_smoke_timer <= 0.0f) {
-			damage_smoke_emitter->setEmissionEnabled(false);
-			damage_smoke_timer = 0.0f;
-		}
-	}
-	damage_smoke_emitter->update(delta_time);
+	
 
 
-	// 3) Limpieza de entidades
+	//Limpieza de entidades
 	for (auto e : entities_to_destroy)
 	{
 		if (e->parent) e->parent->removeChild(e);
@@ -490,20 +361,8 @@ void World::updateCamera(float dt)
 	Vector3 planePos = player->model.getTranslation();
 	Vector3 front = player->model.frontVector().normalize();
 
-	// MOOTHING
-	//smoothedTarget = smoothedTarget * 0.9f + planePos * 0.1f;
-
-	//POSICIÓ CÀMERA
-	//Vector3 cam_offset=Vector3(0.0f, 0.3f, -10.2f);
-
-	//Vector3 eye =smoothedTarget +front * cam_offset.z +Vector3(0.0f, cam_offset.y, 0.0f);
-
-	//Vector3 center = smoothedTarget;
-
-	//Vector3 rotatedUp = player->model.rotateVector(Vector3(0, 1, 0));
-	//camera->lookAt(eye, center, rotatedUp);
 	Vector3 rotatedUp = player->model.rotateVector(Vector3(0, 1, 0));
-	Vector3 cam_offset(0.0f, 4.5f, -20.2f); //para poner la camara mas atras usamos el valor negativo en z y 0.3 
+	Vector3 cam_offset(0.0f, 4.5f, -20.2f); //para poner la camara mas atras usamos el valor negativo en z 20
 	Vector3 new_eye = planePos
 		+ front * cam_offset.z
 		+ Vector3(0, cam_offset.y, 0);

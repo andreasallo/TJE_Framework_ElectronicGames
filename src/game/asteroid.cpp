@@ -19,8 +19,6 @@ void Asteroid::update(float dt)
     //els meteorits es mouen cap al jugador → direcció -Z
     model.translate(0, 0, -speed * dt);
 
-
-
     //si passen del jugador → destruir
     if (model.getTranslation().z < World::instance->player->model.getTranslation().z - 150.0f) {
      

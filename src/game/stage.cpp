@@ -745,6 +745,7 @@ void PlayStage::render(Camera* camera) {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glDisable(GL_DEPTH_TEST);
             Shader* v_shader = Shader::Get("data/shaders/screen.vs", "data/shaders/vignetting.fs");
+            if (player->lives <= 0) { v_shader = Shader::Get("data/shaders/screen.vs", "data/shaders/vignetting_red.fs"); }
             v_shader->enable();
             v_shader->setUniform("u_intensity", vignette_intensity);
             screen_quad->render(GL_TRIANGLES);
@@ -802,8 +803,13 @@ void PlayStage::update(double seconds_elapsed, Camera* camera) {
     if (player->turbo) {
         target_vignette = 1.2f;
     }
+    else if (player->lives <= 0) {
+        target_vignette = 1.2f;
+    }
     float speed = 3.0f * (float)seconds_elapsed;
     vignette_intensity = lerp(vignette_intensity, target_vignette, speed);
+
+
 
     /*----------------Això és nou----------------*/
     //si cliques P, s'activa la bandera del menú de pausa
@@ -944,20 +950,27 @@ void EndStage::render(Camera* camera) {
     else {
         title2_1->render(cam2d);
         title2_2->render(cam2d);
-        results->render(cam2d);
+        //results->render(cam2d);
 
-        drawText(instance->window_width / 2, instance->window_height / 2, "Score:", Vector3(1.0), 5);
+        std::string score = std::to_string(player->coins_collected);
+        drawText(instance->window_width / 2 - 155, instance->window_height / 2, "Score:", Vector3(1.0), 5);
+        drawText(instance->window_width / 2 + 45, instance->window_height / 2, score, Vector3(1.0), 5);
     }
 }
 
 void EndStage::update(double seconds_elapsed, Camera* camera) {
     Game* instance = Game::instance;
+    Player* player = Player::instance;
     /*
     if ((Input::isKeyPressed(SDL_SCANCODE_X) || Input::isKeyPressed(SDL_SCANCODE_Z) || (Input::gamepads[0].isButtonPressed(A_BUTTON)) || (Input::gamepads[0].isButtonPressed(B_BUTTON)) || (Input::gamepads[0].isButtonPressed(Y_BUTTON)) || (Input::gamepads[0].isButtonPressed(X_BUTTON)))) {
         instance->audio->Play("sounds/coin.wav");
         instance->setStage(MAIN_MENU, END_STAGE);
     }
     */
+    if (player->turbo) {
+        zWasPressed = true;
+        player->turbo = false;
+    }
 
     //temporitzador de 1s per què no s'en vagi directament al menú principal si estàs presionant Z
     if (Input::isKeyPressed(SDL_SCANCODE_Z) && zWasPressed == false) { instance->setStage(MAIN_MENU, END_STAGE); }

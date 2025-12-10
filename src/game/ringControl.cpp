@@ -45,7 +45,7 @@ void RingControl::update(float dt)
                 std::cout << "RING! +3s turbo" << std::endl;
                 Audio::Play("data/coin.wav", 1.0f, BASS_SAMPLE_MONO);
             
-                player->coins_collected++;
+                player->coins_collected += 100;
                 player->turbo_timer = player->turbo_duration;
                 player->turbo_bar->mask = 1.0f;
             }

@@ -63,7 +63,7 @@ void Projectile::update(float dt)
 
             // Moneda
             if (World::instance->player)
-                World::instance->player->coins_collected++;
+                World::instance->player->coins_collected += 50;
             Audio::Play("data/explosion-01.wav", 1.0f, BASS_SAMPLE_MONO);
 
             std::cout << "Impacto confirmado!" << std::endl;
